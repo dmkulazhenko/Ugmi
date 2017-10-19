@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+        <!--========== PAGE CONTENT ==========-->
+        <!-- Feedback Form -->
+        <div class="g-position--relative g-bg-color--primary">
+            <div class="g-container--md g-padding-y-150--xs">
+                <div class="g-text-center--xs g-margin-t-50--xs g-margin-b-80--xs">
+                    <h2 class="text-none g-font-size-32--xs g-font-size-36--sm g-color--white">Давайте общаться!</h2>
+                </div>
+                <div class="row g-row-col--5 g-margin-b-80--xs">
+                    <div class="col-xs-4 g-full-width--xs g-margin-b-50--xs g-margin-b-0--sm">
+                        <div class="g-text-center--xs">
+                            <i class="g-display-block--xs g-font-size-40--xs g-color--white-opacity g-margin-b-30--xs ti-email"></i>
+                            <h4 class="g-font-size-18--xs g-color--white g-margin-b-5--xs">E-Mail</h4>
+                            <p class="g-color--white-opacity">dimkaxdx@gmail.com</p>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 g-full-width--xs g-margin-b-50--xs g-margin-b-0--sm">
+                        <div class="g-text-center--xs">
+                            <i class="g-display-block--xs g-font-size-40--xs g-color--white-opacity g-margin-b-30--xs ti-map-alt"></i>
+                            <h4 class="g-font-size-18--xs g-color--white g-margin-b-5--xs">Адрес</h4>
+                            <p class="g-color--white-opacity">Брест, Карла Маркса, 29</p>
+                        </div>
+                    </div>
+                    <div class="col-xs-4 g-full-width--xs">
+                        <div class="g-text-center--xs">
+                            <i class="g-display-block--xs g-font-size-40--xs g-color--white-opacity g-margin-b-30--xs ti-headphone-alt"></i>
+                            <h4 class="g-font-size-18--xs g-color--white g-margin-b-5--xs">Телефон</h4>
+                            <p class="g-color--white-opacity">+ 375 (33) 344-14-14</p>
+                        </div>
+                    </div>
+                </div>
+                {% if err %}
+                    <div class="g-margin-b-20--xs g-margin-l-150--xs">
+                        <h2 class="text-none g-margin-l-45--xs g-font-size-20--xs g-font-size-25--md g-color--white">{{err}}</h2>
+                    </div>
+                {% endif %}
+                <form class="center-block g-width-500--sm g-width-550--md" enctype="multipart/form-data" method="post" action="">
+                    <div class="g-margin-b-30--xs">
+                        <input type="text" name="name" class="form-control s-form-v3__input" placeholder="* Имя">
+                    </div>
+                    <div class="row g-row-col-5 g-margin-b-50--xs">
+                        <div class="col-sm-6 g-margin-b-30--xs g-margin-b-0--md">
+                            <input type="email" name="email" class="form-control s-form-v3__input" placeholder="* E-Mail">
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="text" name="phone" class="form-control s-form-v3__input" placeholder="* Телефон">
+                        </div>
+                    </div>
+                    <div class="g-margin-b-80--xs">
+                        <textarea class="form-control s-form-v3__input" name="msg" rows="5" placeholder="* Сообщение"></textarea>
+                    </div>
+                    <div class="g-text-center--xs">
+                        <button type="submit" class="text-uppercase s-btn s-btn--md s-btn--white-bg g-radius--50 g-padding-x-70--xs g-margin-b-20--xs">Отправить</button>
+                    </div>
+                </form>
+            </div>
+            <img class="s-mockup-v2" src="static/img/mockups/pencil-01.png" alt="Mockup Image">
+        </div>
+        <!-- End Feedback Form -->
+        <!--========== END PAGE CONTENT ==========-->
+
+{% endblock %}
