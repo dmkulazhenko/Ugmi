@@ -99,3 +99,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# macOs
+.DS_Store
+
+# Private data
+config.py

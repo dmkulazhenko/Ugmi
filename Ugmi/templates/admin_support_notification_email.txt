@@ -1,0 +1,6 @@
+{{support_msg.name}} написал в поддержку...
+
+Имя: {{support_msg.name}}
+Email: {{support_msg.email}}
+Телефон: {{support_msg.phone}}
+Cообщение: {{support_msg.msg}}

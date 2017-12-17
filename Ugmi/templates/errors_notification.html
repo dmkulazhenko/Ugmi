@@ -1,0 +1,14 @@
+{% for field in form.errors %}
+    {% for error in form.errors[field] %}
+        <script>
+        $.toast({
+            heading: 'Ошибочка...',
+            text: "{{error}}",
+            showHideTransition: 'fade',
+            icon: 'error',
+            hideAfter: 12500,
+            allowToastClose: true
+        })
+        </script>
+    {% endfor %}
+{% endfor %}
