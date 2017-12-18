@@ -52,8 +52,8 @@ class Contact_us_form(FlaskForm):
         if ac == False:
             return False
 
-        self.name.data = self.name.data.title()
-        self.email.data = self.email.data.lower()
+        self.name.data = self.name.data.strip().title()
+        self.email.data = self.email.data.strip().lower()
         for junk_char in '#()- ': self.phone.data = self.phone.data.replace(junk_char, '')
 
         return True
@@ -99,9 +99,9 @@ class Registration_form(FlaskForm):
         if not FlaskForm.validate(self):
             return False
 
-        self.name.data = self.name.data.title()
-        self.username.data = self.username.data.lower()
-        self.email.data = self.email.data.lower()
+        self.name.data = self.name.data.strip().title()
+        self.username.data = self.username.data.strip().lower()
+        self.email.data = self.email.data.strip().lower()
 
         ac = True
         if re.match("^[A-Za-zА-Яа-я ]*$", self.name.data) == None:
@@ -151,7 +151,7 @@ class Login_form(FlaskForm):
         if not FlaskForm.validate(self):
             return False
 
-        self.login.data = self.login.data.lower()
+        self.login.data = self.login.data.strip().lower()
 
         if '@' in self.login.data:
             user = User.query.filter_by(email = self.login.data).first()
@@ -191,7 +191,7 @@ class Password_reset_form(FlaskForm):
         if not FlaskForm.validate(self):
             return False
 
-        self.login.data = self.login.data.lower()
+        self.login.data = self.login.data.strip().lower()
 
         if '@' in self.login.data:
             user = User.query.filter_by(email = self.login.data).first()

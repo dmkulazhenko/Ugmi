@@ -105,3 +105,6 @@ ENV/
 
 # Private data
 config.py
+
+#database junk
+/Ugmi/database
