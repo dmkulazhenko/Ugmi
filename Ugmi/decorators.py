@@ -12,9 +12,10 @@ def async(f):
 
 
 def admin_only(f):
-    def wrapper(*args, **kwargs):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
         if (not g.user.is_authenticated) or (not g.user.is_admin):
             flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только администраторам.' }, 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
-    return wrapper
+    return decorated_function

@@ -12,3 +12,4 @@ Rename config_public.py to config.py
 
 Founded bugs:
 • White line (before promo) on /project.
+• If someone visit LOGIN ONLY page, he will be redirected without msg.

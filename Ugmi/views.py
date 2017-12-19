@@ -250,8 +250,8 @@ def login():
 
 
 
-@login_required
 @app.route('/logout')
+@login_required
 def logout():
     logout_user()
     flash({'head' : u'Мы будем скучать!', 'msg' : u'Возвращайтесь поскорее!' }, 'success')
@@ -260,16 +260,16 @@ def logout():
 
 
 
-@admin_only
 @app.route('/admin/utils')
-def admin_utils():
-    return render_template('admin_utils.http')
-
-
-
-
 @admin_only
+def admin_utils():
+    return render_template('admin_utils.html')
+
+
+
+
 @app.route('/admin/utils/small/generate/<id>')
+@admin_only
 def generate_small_mark(id):
     if not id.isdecimal():
         return 'Id must be a digit.'
@@ -284,8 +284,8 @@ def generate_small_mark(id):
 
 
 
-@admin_only
 @app.route('/admin/utils/alias/add')
+@admin_only
 def add_alias():
     alias = request.args.get('alias', None)
     id    = request.args.get('id', None)
@@ -305,6 +305,9 @@ def add_alias():
     bydlo_alias.write(json.dumps(dick))
     bydlo_alias.close()
     return 'Alias binded.'
+
+
+
 
 @app.route('/utils/alias/get')
 def get_alias():
