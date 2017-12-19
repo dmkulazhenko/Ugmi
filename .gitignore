@@ -108,3 +108,6 @@ config.py
 
 #database junk
 /Ugmi/database
+
+#Bydlo_alias
+bydlo_alias.json

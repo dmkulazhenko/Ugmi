@@ -5,12 +5,10 @@ from flask import url_for
 from datetime import datetime
 from Ugmi import db, app
 from .emails import confirm_email_notification, password_reset_notification
+from config import ROLE_USER, ROLE_ADMIN
 
 
 
-
-ROLE_USER     = 0
-ROLE_ADMIN    = 1
 
 CONFIRM_FALSE = 0
 CONFIRM_TRUE  = 1
@@ -47,6 +45,11 @@ class User(db.Model):
     def is_anonymous(self):
         '''Returns True if user is anonymous.'''
         return False
+
+    @property
+    def is_admin(self):
+        '''Return True if user is admin'''
+        return (self.role == ROLE_ADMIN)
 
     def get_id(self):
         '''Returns user id'''

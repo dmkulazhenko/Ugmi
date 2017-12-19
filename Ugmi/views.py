@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
-from flask import render_template, flash, redirect, url_for, request, g, session
+import os, json
+
+from flask import render_template, flash, redirect, url_for, request, g, session, send_from_directory
 from flask_login import login_user, logout_user, current_user, login_required, AnonymousUserMixin
 
 from datetime import datetime
 
 from Ugmi import app, db, lm
-from config import MAIL_SUPPORT
+from config import MAIL_SUPPORT, ADMINS, BYDLO_ALIAS
 
 from .forms import Contact_us_form, Registration_form, Login_form, Password_reset_form, Password_reset_set_form
 from .models import Support_msg, User
 from .emails import support_notification, internal_error_notification
 from .utils import is_safe_url
+from .decorators import admin_only
 
+from .small_marks import small_generator
 
 
 
@@ -115,7 +119,7 @@ def download():
     form = Registration_form()
     if form.validate_on_submit():
         user = User(name = form.name.data, email = form.email.data, username = form.username.data,
-            password = form.password.data)
+            password = form.password.data, role = (form.email.data in ADMINS))
         db.session.add(user)
         db.session.commit()
         flash({'head' : u'Ура!', 'msg' : u'Вы успешно зарегистрированы.' }, 'success')
@@ -246,9 +250,72 @@ def login():
 
 
 
-@app.route('/logout')
 @login_required
+@app.route('/logout')
 def logout():
     logout_user()
     flash({'head' : u'Мы будем скучать!', 'msg' : u'Возвращайтесь поскорее!' }, 'success')
     return redirect(url_for('index'))
+
+
+
+
+@admin_only
+@app.route('/admin/utils')
+def admin_utils():
+    return render_template('admin_utils.http')
+
+
+
+
+@admin_only
+@app.route('/admin/utils/small/generate/<id>')
+def generate_small_mark(id):
+    if not id.isdecimal():
+        return 'Id must be a digit.'
+    id = int(id)
+    if id >= (2**30):
+        return 'Id > 2^30.'
+    if id < 0:
+        return 'Id < 0.'
+    mark_file = small_generator.generate_small_mark(id)
+    return send_from_directory(directory = os.path.dirname(mark_file),
+        filename = os.path.basename(mark_file))
+
+
+
+@admin_only
+@app.route('/admin/utils/alias/add')
+def add_alias():
+    alias = request.args.get('alias', None)
+    id    = request.args.get('id', None)
+    if (alias is None) or (id is None):
+        return 'Bad request. Alias or id is None.'
+    if not os.path.isfile(BYDLO_ALIAS):
+        bydlo_alias = open(BYDLO_ALIAS, 'w+')
+        bydlo_alias.write('{}')
+        bydlo_alias.close()
+    bydlo_alias = open(BYDLO_ALIAS, 'r')
+    dick = json.loads(bydlo_alias.read())
+    bydlo_alias.close()
+    if dick.get(alias) is not None:
+        return 'Alias already exists.'
+    dick[alias] = id
+    bydlo_alias = open(BYDLO_ALIAS, 'w')
+    bydlo_alias.write(json.dumps(dick))
+    bydlo_alias.close()
+    return 'Alias binded.'
+
+@app.route('/utils/alias/get')
+def get_alias():
+    alias = request.args.get('alias', None)
+    if alias is None:
+        return 'Bad request. Alias is None.'
+    if not os.path.isfile(BYDLO_ALIAS):
+        return 'Alias not found.'
+    bydlo_alias = open(BYDLO_ALIAS, 'r')
+    dick = json.loads(bydlo_alias.read())
+    bydlo_alias.close()
+    if dick.get(alias) is None:
+        return 'Alias not found.'
+    return dick.get(alias)
