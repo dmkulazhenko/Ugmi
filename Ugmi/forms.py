@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import string, re, bcrypt
+import string, re, bcrypt, os
 from datetime import datetime
 from flask import flash, Markup, url_for
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 from .models import User
+from config import SMALL_MARKS_DIR, MARKS_DATA_FILE
 
 
 
@@ -233,4 +234,71 @@ class Password_reset_set_form(FlaskForm):
             return False
 
         self.password.data = bcrypt.hashpw(bytes(self.password.data, 'utf-8'), bcrypt.gensalt()).decode('utf-8')
+        return True
+
+
+
+
+class Add_small_mark_form(FlaskForm):
+    mark_id = StringField('mark_id', [ DataRequired(message=u'Введите ID метки.') ], render_kw = {"placeholder" : u"ID метки"})
+    title = StringField('title', [
+        DataRequired(message=u'Введите заголовок.'),
+        Length(min=3, max=256, message=u'Сликшом короткий или длинный заголовок.)')
+    ], render_kw = {"placeholder" : u"Заголовок"})
+    img = StringField('image', [ DataRequired(message=u'Введите ссылку на аватарку.') ], render_kw = {"placeholder" : u"Ссылка на аватарку"})
+    video = StringField('video', [ DataRequired(message=u'Введите ссылку на видео.') ], render_kw = {"placeholder" : u"Ссылка на видео"})
+    site = StringField('site', [ DataRequired(message=u'Введите ссылку на сайт.') ], render_kw = {"placeholder" : u"Ссылка на сайт"})
+
+
+    def flash_errors(self):
+        for field, errors in self.errors.items():
+            for error in errors:
+                flash({'head' : u'Упс...', 'msg' : error }, 'error')
+
+
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+
+        if re.match("^[0-9]*$", self.mark_id.data) == None:
+            self.mark_id.errors.append(u'ID метки -- число.')
+            return False
+
+        if(int(self.mark_id.data) < 0 or int(self.mark_id.data) > 2**30):
+            self.mark_id.errors.append(u'ID метки -- число от 0 до 2^30.')
+            return False
+
+        mark_dir = os.path.join(SMALL_MARKS_DIR, self.mark_id.data)
+        if not os.path.isdir(mark_dir):
+            os.mkdir(mark_dir)
+        mark_data_file = os.path.join(mark_dir, MARKS_DATA_FILE)
+        if os.path.isfile(mark_data_file):
+            self.mark_id.errors.append(u'ID метки уже занят.')
+            return False
+
+        return True
+
+
+class Generate_small_mark_form(FlaskForm):
+    mark_id = StringField('mark_id', [ DataRequired(message=u'Введите ID метки.') ], render_kw = {"placeholder" : u"ID метки"})
+
+
+    def flash_errors(self):
+        for field, errors in self.errors.items():
+            for error in errors:
+                flash({'head' : u'Упс...', 'msg' : error }, 'error')
+
+
+    def validate(self):
+        if not FlaskForm.validate(self):
+            return False
+
+        if re.match("^[0-9]*$", self.mark_id.data) == None:
+            self.mark_id.errors.append(u'ID метки -- число.')
+            return False
+
+        if(int(self.mark_id.data) < 0 or int(self.mark_id.data) > 2**30):
+            self.mark_id.errors.append(u'ID метки -- число от 0 до 2^30.')
+            return False
+
         return True

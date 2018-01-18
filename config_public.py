@@ -51,6 +51,7 @@ ROLE_ADMIN                     = 1
 LOG_FILE                       = 'ugmi.log'
 
 #Marks
+MARKS_DATA_FILE = 'data.json'
 
 #Small
 SMALL_GENERATOR = os.path.join(generators_dir, 'small_generator.jar')
@@ -58,7 +59,3 @@ SMALL_MARKS_DIR = os.path.join(base_dir, 'Small_marks')
 SMALL_MARKS_EXTENSION = '.png'
 
 #Large
-
-
-#Alias
-BYDLO_ALIAS = os.path.join(base_dir, 'bydlo_alias.json')

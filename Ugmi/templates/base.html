@@ -125,7 +125,7 @@
                                     <li class="s-header-v2__nav-item"><a href="{{url_for("contacts")}}" class="s-header-v2__nav-link">Контакты</a></li>
                                     <li class="s-header-v2__nav-item"><a href="{{url_for("download")}}" class="s-header-v2__nav-link">Скачать</a></li>
                                     {% if g.user.is_admin %}
-                                        <li class="s-header-v2__nav-item"><a href="{{url_for("admin_utils")}}" class="s-header-v2__nav-link">Утилиты</a></li>
+                                        <li class="s-header-v2__nav-item"><a href="{{url_for("add_small_mark")}}" class="s-header-v2__nav-link">Добавить</a></li>
                                     {% endif %}
                                     {% if g.user.is_authenticated %}
                                         <li class="s-header-v2__nav-item"><a href="{{url_for("logout")}}" class="s-header-v2__nav-link">Выйти</a></li>

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+        <!--========== PAGE CONTENT ==========-->
+        <!-- Feedback Form -->
+        <div class="g-position--relative g-bg-color--primary">
+            <div class="g-container--md g-padding-y-150--xs">
+                <div class="g-text-center--xs g-margin-t-50--xs g-margin-b-80--xs">
+                    <h2 class="text-none g-font-size-32--xs g-font-size-36--sm g-color--white">Посмотреть меточку?!</h2>
+                </div>
+
+                <form class="center-block g-width-500--sm g-width-550--md" enctype="multipart/form-data" method="post" action="">
+                    {{form.hidden_tag()}}
+                    <div class="g-margin-b-30--xs">
+                        {{form.mark_id(class_="form-control s-form-v3__input")}}
+                    </div>
+                    <div class="g-text-center--xs">
+                        <button type="submit" class="text-uppercase s-btn s-btn--md s-btn--white-bg g-radius--50 g-padding-x-70--xs g-margin-b-20--xs">Отправить</button>
+                    </div>
+                </form>
+            </div>
+            <img class="s-mockup-v2" src="/static/img/mockups/pencil-01.png" alt="Mockup Image">
+        </div>
+        <!-- End Feedback Form -->
+        <!--========== END PAGE CONTENT ==========-->
+
+{% endblock %}

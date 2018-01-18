@@ -7,15 +7,15 @@ from flask_login import login_user, logout_user, current_user, login_required, A
 from datetime import datetime
 
 from Ugmi import app, db, lm
-from config import MAIL_SUPPORT, ADMINS, BYDLO_ALIAS
+from config import MAIL_SUPPORT, ADMINS
 
-from .forms import Contact_us_form, Registration_form, Login_form, Password_reset_form, Password_reset_set_form
+from .forms import Contact_us_form, Registration_form, Login_form, Password_reset_form, Password_reset_set_form, Add_small_mark_form, Generate_small_mark_form
 from .models import Support_msg, User
 from .emails import support_notification, internal_error_notification
 from .utils import is_safe_url
 from .decorators import admin_only
 
-from .small_marks import small_generator
+from .small_marks import small_manager
 
 
 
@@ -260,65 +260,27 @@ def logout():
 
 
 
-@app.route('/admin/utils')
+@app.route('/admin/small/generate', methods = ['POST', 'GET'])
 @admin_only
-def admin_utils():
-    return render_template('admin_utils.html')
-
-
-
-
-@app.route('/admin/utils/small/generate/<id>')
-@admin_only
-def generate_small_mark(id):
-    if not id.isdecimal():
-        return 'Id must be a digit.'
-    id = int(id)
-    if id >= (2**30):
-        return 'Id > 2^30.'
-    if id < 0:
-        return 'Id < 0.'
-    mark_file = small_generator.generate_small_mark(id)
-    return send_from_directory(directory = os.path.dirname(mark_file),
+def generate_small_mark():
+    form = Generate_small_mark_form()
+    if form.validate_on_submit():
+        mark_file = small_manager.generate_small_mark(form.mark_id.data)
+        return send_from_directory(directory = os.path.dirname(mark_file),
         filename = os.path.basename(mark_file))
+    form.flash_errors()
+    return render_template('admin_generate_mark.html', form = form, img = None)
 
 
 
-@app.route('/admin/utils/alias/add')
+@app.route('/admin/small/add', methods = ['GET', 'POST'])
 @admin_only
-def add_alias():
-    alias = request.args.get('alias', None)
-    id    = request.args.get('id', None)
-    if (alias is None) or (id is None):
-        return 'Bad request. Alias or id is None.'
-    if not os.path.isfile(BYDLO_ALIAS):
-        bydlo_alias = open(BYDLO_ALIAS, 'w+')
-        bydlo_alias.write('{}')
-        bydlo_alias.close()
-    bydlo_alias = open(BYDLO_ALIAS, 'r')
-    dick = json.loads(bydlo_alias.read())
-    bydlo_alias.close()
-    if dick.get(alias) is not None:
-        return 'Alias already exists.'
-    dick[alias] = id
-    bydlo_alias = open(BYDLO_ALIAS, 'w')
-    bydlo_alias.write(json.dumps(dick))
-    bydlo_alias.close()
-    return 'Alias binded.'
-
-
-
-
-@app.route('/utils/alias/get')
-def get_alias():
-    alias = request.args.get('alias', None)
-    if alias is None:
-        return 'Bad request. Alias is None.'
-    if not os.path.isfile(BYDLO_ALIAS):
-        return 'Alias not found.'
-    bydlo_alias = open(BYDLO_ALIAS, 'r')
-    dick = json.loads(bydlo_alias.read())
-    bydlo_alias.close()
-    if dick.get(alias) is None:
-        return 'Alias not found.'
-    return dick.get(alias)
+def add_small_mark():
+    form = Add_small_mark_form()
+    if form.validate_on_submit():
+        small_manager.add_small_mark(form.mark_id.data, form.title.data,
+            form.img.data, form.video.data, form.site.data)
+        flash({ 'head' : u'Успех!', 'msg' : u'Объект успешно добавлен!' }, 'success')
+        return redirect(url_for('add_small_mark'))
+    form.flash_errors()
+    return render_template('admin_add_mark.html', form = form)
