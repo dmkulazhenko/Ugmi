@@ -15,7 +15,7 @@ from .emails import support_notification, internal_error_notification
 from .utils import is_safe_url
 from .decorators import admin_only
 
-from .small_marks import small_manager
+from .marks import small_manager
 
 
 
@@ -110,6 +110,20 @@ def team():
 @app.route('/project')
 def project():
     return render_template('project.html')
+
+
+
+
+@app.route('/donate')
+def donate():
+    return render_template('donate.html')
+
+
+
+
+@app.route('/beta')
+def beta():
+    return render_template('beta.html')
 
 
 
@@ -270,6 +284,7 @@ def generate_small_mark():
         filename = os.path.basename(mark_file))
     form.flash_errors()
     return render_template('admin_generate_mark.html', form = form, img = None)
+
 
 
 
