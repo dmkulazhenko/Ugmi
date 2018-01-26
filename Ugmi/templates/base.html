@@ -13,6 +13,7 @@
 
         <!-- Web Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i|Montserrat:400,700" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css?family=Playfair+Display:400,700" rel="stylesheet">
 
         <!-- Vendor Styles -->
         <link href="/static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css"/>
@@ -33,6 +34,10 @@
 
         <!-- Toastr style -->
         <link href="/static/css/toast.min.css" rel="stylesheet" type="text/css"/>
+        <script type="text/javascript" src="/static/vendor/jquery.min.js"></script>
+
+        <script type="text/javascript" src="/static/js/components/moment.js"></script>
+
     </head>
     <!-- End Head -->
 
@@ -122,14 +127,26 @@
                                 <ul class="s-header-v2__nav">
                                     <li class="s-header-v2__nav-item"><a href="{{url_for("project")}}" class="s-header-v2__nav-link">О Проекте</a></li>
                                     <li class="s-header-v2__nav-item"><a href="{{url_for("beta")}}" class="s-header-v2__nav-link">Бета-тест</a></li>
-                                    <li class="s-header-v2__nav-item"><a href="{{url_for("team")}}" class="s-header-v2__nav-link">О Нас</a></li>
                                     <li class="s-header-v2__nav-item"><a href="{{url_for("contacts")}}" class="s-header-v2__nav-link">Контакты</a></li>
                                     <li class="s-header-v2__nav-item"><a href="{{url_for("download")}}" class="s-header-v2__nav-link">Скачать</a></li>
-                                    {% if g.user.is_admin %}
-                                        <li class="s-header-v2__nav-item"><a href="{{url_for("add_small_mark")}}" class="s-header-v2__nav-link">Добавить</a></li>
-                                    {% endif %}
                                     {% if g.user.is_authenticated %}
-                                        <li class="s-header-v2__nav-item"><a href="{{url_for("logout")}}" class="s-header-v2__nav-link">Выйти</a></li>
+                                        <li class="dropdown s-header-v2__nav-item s-header-v2__dropdown-on-hover">
+                                           <a href="javascript:void(0);" class="dropdown-toggle s-header-v2__nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Метки {{g.user.have_marks}}/{{g.user.max_marks}}<span class="g-font-size-10--xs g-margin-l-5--xs ti-angle-down"></span></a>
+                                           <ul class="dropdown-menu s-header-v2__dropdown-menu">
+                                               <li><a href="{{url_for("add_small_mark")}}" class="s-header-v2__dropdown-menu-link">Добавить метку</a></li>
+                                               <li><a href="{{url_for("list_of_marks")}}" class="s-header-v2__dropdown-menu-link">Мои метки</a></li>
+                                           </ul>
+                                        </li>
+                                        <li class="dropdown s-header-v2__nav-item s-header-v2__dropdown-on-hover">
+                                           <a href="javascript:void(0);" class="dropdown-toggle s-header-v2__nav-link" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{g.user.username}}<span class="g-font-size-10--xs g-margin-l-5--xs ti-angle-down"></span></a>
+                                           <ul class="dropdown-menu s-header-v2__dropdown-menu">
+                                               <li><a href="{{url_for("project", _anchor="plan")}}" class="s-header-v2__dropdown-menu-link">Статус: {{g.user.prefix}}</a></li>
+                                               {% if g.user.is_admin %}
+                                                    <li><a href="{{url_for("terminal")}}" class="s-header-v2__dropdown-menu-link">Терминал</a></li>
+                                               {% endif %}
+                                               <li><a href="{{url_for("logout")}}" class="s-header-v2__dropdown-menu-link">Выйти</a></li>
+                                           </ul>
+                                        </li>
                                     {% else %}
                                         <li class="s-header-v2__nav-item"><a href="{{url_for("login")}}" class="s-header-v2__nav-link">Войти</a></li>
                                     {% endif %}
@@ -204,7 +221,6 @@
         <!--========== JAVASCRIPTS (Load javascripts at bottom, this will reduce page load time) ==========-->
         <!-- Vendor -->
         <script type="text/javascript" src="/static/js/toast.min.js"></script>
-        <script type="text/javascript" src="/static/vendor/jquery.min.js"></script>
         <script type="text/javascript" src="/static/vendor/jquery.migrate.min.js"></script>
         <script type="text/javascript" src="/static/vendor/bootstrap/js/bootstrap.min.js"></script>
         <script type="text/javascript" src="/static/vendor/jquery.smooth-scroll.min.js"></script>
@@ -230,6 +246,9 @@
         <script type="text/javascript" src="/static/js/components/parallax.min.js"></script>
         <script type="text/javascript" src="/static/js/components/google-map.min.js"></script>
         <script type="text/javascript" src="/static/js/components/wow.min.js"></script>
+        <script type="text/javascript" src="/static/js/components/scrollbar.min.js"></script>
+        <script type="text/javascript" src="/static/js/components/faq.min.js"></script>
+
         <!--========== END JAVASCRIPTS ==========-->
 
     </body>

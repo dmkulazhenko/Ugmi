@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block content %}
+<link href="/static/css/table/dmitrycpp.css" rel="stylesheet" type="text/css"/>
+<div class="about_mark g-bg-position--center g-fullheight--sm">
+    <div class="container g-ver-center--sm g-padding-y-125--xs g-padding-y-0--sm">
+        <div class="g-margin-t-30--xs g-margin-t-0--sm">
+             <div class="col-lg-4 col-sm-4 g-hor-centered-row__col">
+                <div class="center-block g-width-500--xs g-bg-color--white-opacity-lightest g-padding-x-40--xs g-padding-y-50--xs g-radius--4">
+                    <div class="g-text-center--xs g-margin-b-40--xs">
+                        <a href="{{url_for('delete_small_mark', mark_id = mark.id)}}" onclick="return confirm('Удалить метку?')" style="float: right"><i class="g-font-size-22--xs g-color--white ti-close"></i></a>
+                        <a href="{{url_for('edit_small_mark', mark_id = mark.id)}}" style="float: right"><i class="g-font-size-22--xs g-color--white ti-settings"></i></a>
+                        <h2 class="g-font-size-26--xs g-color--white">Метка {{mark.id}}</h2>
+                        <br \>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">ID: {{mark.id}}.</h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">Название: {{mark.title}}.</h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">
+                            Сайт:
+                            {% if mark.site %}
+                                <a href="{{mark.site}}" class="g-color--primary">настроен</a>.
+                            {% else %}
+                                <a class="g-color--red">отсутсвует</a>.
+                            {% endif %}
+                        </h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">
+                            Иконка:
+                            {% if mark.img %}
+                                <a href="{{mark.img}}" class="g-color--primary">настроена</a>.
+                            {% else %}
+                                <a class="g-color--red">отсутсвует</a>.
+                            {% endif %}
+                        </h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">
+                            Видео:
+                            {% if mark.video %}
+                                <a href="{{mark.video}}" class="g-color--primary">настроено</a>.
+                            {% else %}
+                                <a class="g-color--red">отсутсвует</a>.
+                            {% endif %}
+                        </h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">Просмотры: {{mark.views}}.</h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">Время создания: {{momentjs(mark.creation_time).calendar()}}.</h2>
+                        <h2 class="g-font-size-16--xs g-color--white" style="text-align: left; text-transform: none">Владелец: {{mark.user.name}} ({{mark.user.username}}).</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+             <div class="col-lg-4 col-sm-4 g-hor-centered-row__col g-margin-r-100--xs" style="float: right">
+                <div class="center-block g-width-500--xs g-bg-color--white-opacity-lightest g-padding-x-25--xs g-padding-y-70--xs g-radius--4">
+                    <div class="g-text-center--xs">
+                        <img width="300" src="{{url_for('print_small_mark', mark_id = mark.id)}}">
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+{% endblock %}

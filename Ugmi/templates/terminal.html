@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta charset="utf-8" />
+    <title>UGMI-Terminal</title>
+    <link rel="sitemap" type="application/xml" title="Sitemap" href=""/>
+    <link rel="shortcut icon" href="/static/img/favicon.ico"/>
+    <script src="/static/terminal/jquery-1.7.1.min.js"></script>
+    <script src="/static/terminal/jquery.mousewheel-min.js"></script>
+    <script src="/static/terminal/jquery.terminal.min.js"></script>
+    <link href="/static/terminal/jquery.terminal.css" rel="stylesheet"/>
+  </head>
+<body>
+
+<script>
+jQuery(document).ready(function($)
+{
+    var id = 1;
+    $('body').terminal(function(command, term)
+    {
+        command = command.toLowerCase();
+        var args = command.split(" ");
+        if(command == "")
+        {
+            term.echo("");
+        }
+        else if (args[0] == 'help')
+        {
+            term.echo("Easy commands: clear, info, hello, whoami.");
+            term.echo("\nCommands related to users 'user <command>':");
+            term.echo("    info <username> -- get info about user with username = <username>.");
+            term.echo("    Commands related to setting smth 'user set <username> <command>':");
+            term.echo("        marks_limit <max_marks> -- set user`s custom marks limit, whose username = <username>, to <max_marks>.")
+            term.echo("        role <role> -- set user`s role, whose username = <username>, to role with id = <role>.")
+            term.echo("\nCommands related to marks 'mark <command>':");
+            term.echo("    info <mark_id> -- get info about mark with id = <mark_id>.")
+            term.echo("    delete <mark_id> -- delete mark with id = <mark_id>.")
+        }
+
+        else if (args[0] == 'space')
+        {
+            if(need_space == 1)
+                term.echo("Space: enabled -> disabled.")
+            else
+                term.echo("Spaces disabled -> enabled.")
+            need_space = !need_space;
+        }
+
+        else if(args[0] == 'info')
+        {
+            term.echo(term.greetings);
+        }
+
+        else if(args[0] == 'hello')
+        {
+            term.echo("Hi there!");
+        }
+
+        else if(args[0] == 'whoami')
+        {
+            term.echo("Username: {{g.user.username}}");
+            term.echo("Name: {{g.user.name}}");
+            term.echo("Email: {{g.user.email}}");
+            term.echo("Role: {{g.user.role}} ({{g.user.prefix}})");
+            term.echo("Marks: {{g.user.have_marks}} / {{g.user.max_marks}}");
+        }
+
+        else if(args[0] == 'derovi')
+        {
+            term.echo("LOH!");
+        }
+        else if(args[0] == 'flyce')
+        {
+            term.echo("BOH!");
+        }
+
+        else if(args[0] == 'user')
+        {
+            if(args[1] == 'info')
+            {
+                $.ajax({
+        			url: '/ajax/user/'+args[2],
+        			type: 'GET',
+        			success: function(response){
+                        if(response['status'] == 'success')
+                        {
+                            term.echo("Status: " + response['status'])
+                            term.echo("Username: " + response['username']);
+                            term.echo("Name: " + response['name']);
+                            term.echo("Email: " + response['email']);
+                            term.echo("ID: " + response['id']);
+                            term.echo("Role: " + response['role']);
+                            term.echo("Prefix: " + response['prefix']);
+                            term.echo("Marks: " + response['num_marks'] +" / "+ response['max_marks']);
+                            term.echo("List of marks: " + response['marks']);
+                            term.echo("Confirmed: " + response['confirmed']);
+
+                        }
+                        else
+                        {
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+                        }
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
+            else if(args[1] == 'set')
+            {
+                var username = args[2];
+                if(args[3] == 'role')
+                {
+                    var role_id = args[4];
+                    $.ajax({
+            			url: '/ajax/user/set/role',
+            			type: 'GET',
+                        data : {
+                            username: username,
+                            role_id: role_id
+                        },
+            			success: function(response){
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+            			},
+            			error: function(error){
+            				term.echo(error);
+            			}
+            		});
+                }
+                else if(args[3] == 'marks_limit')
+                {
+                    var max_marks = args[4];
+                    $.ajax({
+            			url: '/ajax/user/set/custom_marks_limit',
+            			type: 'GET',
+                        data : {
+                            username: username,
+                            max_marks: max_marks
+                        },
+            			success: function(response){
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+            			},
+            			error: function(error){
+            				term.echo(error);
+            			}
+            		});
+                }
+            }
+        }
+
+        else if(args[0] == 'mark')
+        {
+            if(args[1] == 'info')
+            {
+                $.ajax({
+        			url: '/ajax/mark/'+args[2],
+        			type: 'GET',
+        			success: function(response){
+                        if(response['status'] == 'success')
+                        {
+                            term.echo("Status: " + response['status'])
+                            term.echo("ID: " + response['id']);
+                            term.echo("Title: " + response['title']);
+                            term.echo("Icon: " + response['img']);
+                            term.echo("Site: " + response['site']);
+                            term.echo("Video: " + response['video']);
+                            term.echo("Views: " + response['views']);
+                            term.echo("Owner: " + response['owner']);
+                        }
+                        else
+                        {
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+                        }
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
+            else if(args[1] == 'delete')
+            {
+                $.ajax({
+        			url: '/ajax/mark/delete',
+        			type: 'GET',
+                    data : {
+                        mark_id: args[2]
+                    },
+        			success: function(response){
+                        term.echo("Status: " + response['status']);
+                        term.echo("Message: " + response['msg']);
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
+
+        }
+
+
+
+        else
+        {
+            term.echo("Unknown command or format error in '" + command +"'");
+        }
+
+    },
+    {
+        greetings:"\n                                                                                                              \n                                                                                                              \n                                                                                                              \n    ;@@@@@@@@@:   X@@@@@@B           ,hHM#@@#MH&MA          G@@@@@@@A        @@@@@@@@9       ;@@@@@@@@@A      \n      ,#@@@2        :@&            3@@#2     2@@@S            2#9@@@B       Gh#@@@X             #@@@h         \n      s@@@@          @           S#@@H        ;#M,            5H,@@@#:     G&X@@@M,            ,@@@#,         \n      &@@@B         iH          :@@@B          AA             AX H@@@5    9& M@@@A             3@@@H          \n     .@@@@h         &9          #@@@;                        .M. X@@@&   hA  @@@@2             H@@@3          \n     X@@@@;        .B:         2@@@H                         i&  ;@@@@  XA  :@@@@             :#@@@,          \n     H@@@H         i&          G@@@&     ,A#@@@@#HG          Br  .@@@@5&G   h@@@9             9@@@M           \n    ,#@@@5         M;          3@@@&       i@@@#            ;B    @@@@@h    @@@@;             #@@@&           \n    :#@@@3       .B9            M@@B       H@@@2            G&    B@@@G    5@@@B             S@@@@i           \n     h@@@@&,  .5HMr              #@@A     S@@@#,           5#H    3@@G     H@@@&             A@@@@            \n       9HM#@#MH9.                 ;GB#@@#MH&S           3@@@@@@M, s@&   H@@@@@@@@B        M@@@@@@@@M.         \n                                                                                                              \n                                                                                                              \n                                                                                                              \n                                                                                                              \nUgmi terminal v1.0. Type 'help' for help.\n\n",
+        prompt: "{{g.user.username}}>",
+        onBlur: function() {
+            // prevent loosing focus
+            return false;
+        }
+    });
+});
+
+</script>
+</body>

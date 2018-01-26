@@ -108,6 +108,7 @@ config.py
 
 #database junk
 /Ugmi/database
+/migrations
 
-#Bydlo_alias
-bydlo_alias.json
+#marks cache
+/Ugmi/marks/small

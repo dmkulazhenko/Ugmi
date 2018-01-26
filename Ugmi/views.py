@@ -1,21 +1,20 @@
 # -*- coding: utf-8 -*-
-import os, json
+import os
 
-from flask import render_template, flash, redirect, url_for, request, g, session, send_from_directory
+from flask import render_template, flash, redirect, url_for, request, g, session, send_from_directory, jsonify
 from flask_login import login_user, logout_user, current_user, login_required, AnonymousUserMixin
 
 from datetime import datetime
+from shutil import rmtree
 
-from Ugmi import app, db, lm
-from config import MAIL_SUPPORT, ADMINS
+from Ugmi import app, db, lm, forms
+from config import MAIL_SUPPORT, ADMINS, ROLE_DEFAULT, ROLE_ADMIN, SMALL_MARKS_DIR
 
-from .forms import Contact_us_form, Registration_form, Login_form, Password_reset_form, Password_reset_set_form, Add_small_mark_form, Generate_small_mark_form
-from .models import Support_msg, User
+from .models import Support_msg, User, Mark
 from .emails import support_notification, internal_error_notification
 from .utils import is_safe_url
-from .decorators import admin_only
+from .decorators import admin_only, owner_only
 
-from .marks import small_manager
 
 
 
@@ -59,7 +58,7 @@ def before_request():
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    form = Contact_us_form()
+    form = forms.Contact_us_form()
     if form.validate_on_submit():
         msg = Support_msg(name = form.name.data, email = form.email.data, phone = form.phone.data, msg = form.msg.data, date = datetime.utcnow())
         db.session.add(msg)
@@ -75,7 +74,7 @@ def index():
 
 @app.route('/contacts', methods = ['GET', 'POST'])
 def contacts():
-    form = Contact_us_form()
+    form = forms.Contact_us_form()
     if form.validate_on_submit():
         msg = Support_msg(name = form.name.data, email = form.email.data, phone = form.phone.data,
             msg = form.msg.data, date = datetime.utcnow())
@@ -92,7 +91,7 @@ def contacts():
 
 @app.route('/team', methods = ['GET', 'POST'])
 def team():
-    form = Contact_us_form()
+    form = forms.Contact_us_form()
     if form.validate_on_submit():
         msg = Support_msg(name = form.name.data, email = form.email.data, phone = form.phone.data,
             msg = form.msg.data, date = datetime.utcnow())
@@ -130,10 +129,13 @@ def beta():
 
 @app.route('/download', methods = ['GET', 'POST'])
 def download():
-    form = Registration_form()
+    form = forms.Registration_form()
     if form.validate_on_submit():
+        role = ROLE_DEFAULT
+        if form.email.data in ADMINS:
+            role = ROLE_ADMIN
         user = User(name = form.name.data, email = form.email.data, username = form.username.data,
-            password = form.password.data, role = (form.email.data in ADMINS))
+            password = form.password.data, role = role)
         db.session.add(user)
         db.session.commit()
         flash({'head' : u'Ура!', 'msg' : u'Вы успешно зарегистрированы.' }, 'success')
@@ -213,7 +215,7 @@ def reset_password_confirm(token):
     if user == None:
         flash({'head' : u'Упс...', 'msg' : u'Ссылка повреждена или просрочена.' }, 'error')
         return redirect(url_for('index'))
-    form = Password_reset_set_form()
+    form = forms.Password_reset_set_form()
     if form.validate_on_submit():
         user.password = form.password.data
         db.session.add(user)
@@ -229,7 +231,7 @@ def reset_password_confirm(token):
 @app.route('/reset', methods = ['GET', 'POST'])
 @app.route('/reset/', methods = ['GET', 'POST'])
 def reset_password():
-    form = Password_reset_form()
+    form = forms.Password_reset_form()
     if form.validate_on_submit():
         user = load_user(form.id.data)
         user.send_password_reset_token()
@@ -249,7 +251,7 @@ def login():
     if g.user.is_authenticated:
         flash({'head' : u'Хмм...', 'msg' : u'Вы уже авторизованы!' }, 'info')
         return redirect(url_for('index'))
-    form = Login_form()
+    form = forms.Login_form()
     if form.validate_on_submit():
         user = load_user(form.id.data)
         login_user(user, remember = form.remember_me.data)
@@ -274,28 +276,114 @@ def logout():
 
 
 
-@app.route('/admin/small/generate', methods = ['POST', 'GET'])
-@admin_only
-def generate_small_mark():
-    form = Generate_small_mark_form()
-    if form.validate_on_submit():
-        mark_file = small_manager.generate_small_mark(form.mark_id.data)
-        return send_from_directory(directory = os.path.dirname(mark_file),
-        filename = os.path.basename(mark_file))
-    form.flash_errors()
-    return render_template('admin_generate_mark.html', form = form, img = None)
-
-
-
-
-@app.route('/admin/small/add', methods = ['GET', 'POST'])
-@admin_only
+@app.route('/small/add', methods = ['GET', 'POST'])
+@login_required
 def add_small_mark():
-    form = Add_small_mark_form()
+    if g.user.is_marks_limit_exceeded:
+        flash({ 'head' : u'Упс!', 'msg' : u'Лимит по добавлению меток для вашего аккаунта исчерпан!' }, 'error')
+        return redirect(url_for('index'))
+    form = forms.Add_small_mark_form()
     if form.validate_on_submit():
-        small_manager.add_small_mark(form.mark_id.data, form.title.data,
-            form.img.data, form.video.data, form.site.data)
-        flash({ 'head' : u'Успех!', 'msg' : u'Объект успешно добавлен!' }, 'success')
+        mark = Mark(
+            id = form.mark_id.data,
+            title = form.title.data,
+            img = form.img.data,
+            video = form.video.data,
+            site = form.site.data,
+            user = g.user
+        )
+        db.session.add(mark)
+        db.session.commit()
+        flash({ 'head' : u'Успех!', 'msg' : u'Метка успешно добавлена!' }, 'success')
         return redirect(url_for('add_small_mark'))
     form.flash_errors()
-    return render_template('admin_add_mark.html', form = form)
+    return render_template('add_small_mark.html', form = form)
+
+
+
+
+@app.route('/small/get/<mark_id>')
+def get_small_mark(mark_id):
+    mark = Mark.query.get(mark_id)
+    if mark == None:
+        return jsonify({'status' : 'error', 'msg' : 'mark with id ' + mark_id + ' not found.'}), 404
+    mark.views += 1
+    db.session.add(mark)
+    db.session.commit()
+    data = {}
+    data['status'] = 'success'
+    data['msg'] = None
+    data['title'] = mark.title
+    data['img'] = mark.img
+    data['site'] = mark.site
+    data['res'] = mark.video
+    return jsonify(data)
+
+
+
+
+@app.route('/small/print/<mark_id>')
+def print_small_mark(mark_id):
+    mark = Mark.query.get(mark_id)
+    if mark == None:
+        return jsonify({'status' : 'error', 'msg' : 'mark with id ' + mark_id + ' not found.'}), 404
+    return mark.get_mark()
+
+
+
+
+@app.route('/small/delete/<mark_id>')
+@owner_only
+def delete_small_mark(mark_id):
+    mark = Mark.query.get(mark_id)
+    db.session.delete(mark)
+    db.session.commit()
+    mark_dir = os.path.join(SMALL_MARKS_DIR, str(mark_id))
+    rmtree(mark_dir)
+    flash({ 'head' : u'Упспешно!', 'msg' : u'Метка успешно удалена!' }, 'success')
+    return redirect(url_for('list_of_marks'))
+
+
+
+
+@app.route('/small/<mark_id>')
+@owner_only
+def about_mark(mark_id):
+    mark = Mark.query.get(mark_id)
+    return render_template('about_small_mark.html', mark = mark)
+
+
+
+
+@app.route('/small/edit/<mark_id>', methods=['GET', 'POST'])
+@owner_only
+def edit_small_mark(mark_id):
+    form = forms.Edit_small_mark_form()
+    mark = Mark.query.get(mark_id)
+    if form.validate_on_submit():
+        mark.title = form.title.data
+        mark.video = form.video.data
+        mark.img = form.img.data
+        mark.site = form.site.data
+        db.session.add(mark)
+        db.session.commit()
+        flash({ 'head' : u'Прекрасно!', 'msg' : u'Информация о метке успешно сохранена!' }, 'success')
+        return redirect(url_for('about_mark', mark_id = mark_id))
+    form.flash_errors()
+    return render_template('edit_small_mark.html', form = form, mark = mark)
+
+
+
+
+@app.route('/list')
+@login_required
+def list_of_marks():
+    return render_template('list_of_marks.html')
+
+
+
+
+@app.route('/terminal')
+@admin_only
+def terminal():
+    return render_template('terminal.html')

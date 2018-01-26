@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <link href="/static/css/table/style.css" rel="stylesheet" type="text/css"/>
+    <script type="text/javascript" src="/static/js/table/index.js"></script>
+    <div class="g-padding-y-100--xs">
+    <!--for demo wrap-->
+    <h1 class="g-margin-t-30--xs g-margin-b-30--xs">Ваши метки</h1>
+    <div class="tbl-header">
+      <table cellpadding="0" cellspacing="0" border="0" class="nogap">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Название</th>
+            <th>Просмотры</th>
+            <th>Дата добавления</th>
+            <th>Видео</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+    <div class="tbl-content">
+      <table cellpadding="0" cellspacing="0" border="0">
+        <tbody>
+          {% for mark in g.user.marks %}
+          <tr class="dmitrycpp" onclick="location.href='{{url_for('about_mark', mark_id = mark.id)}}'">
+            <td>{{mark.id}}</td>
+            <td>{{mark.title}}</td>
+            <td>{{mark.views}}</td>
+            <td>{{momentjs(mark.creation_time).calendar()}}</td>
+            <td>
+                {% if not mark.video %}
+                    <i class="g-font-size-13--xs g-color--white ti-close"></i>
+                {% else %}
+                    <i class="g-font-size-13--xs g-color--white ti-check"></i>
+                {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+
+
+{% endblock %}

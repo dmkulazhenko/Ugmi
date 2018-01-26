@@ -4,9 +4,8 @@ from datetime import datetime
 from flask import flash, Markup, url_for
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, StringField, PasswordField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
-from .models import User
-from config import SMALL_MARKS_DIR, MARKS_DATA_FILE
+from wtforms.validators import DataRequired, Length, Email, EqualTo, URL
+from .models import User, Mark
 
 
 
@@ -182,6 +181,7 @@ class Password_reset_form(FlaskForm):
     ], render_kw = {"placeholder" : u"Email / Username"})
     id = StringField('id')
 
+
     def flash_errors(self):
         for field, errors in self.errors.items():
             for error in errors:
@@ -240,14 +240,20 @@ class Password_reset_set_form(FlaskForm):
 
 
 class Add_small_mark_form(FlaskForm):
-    mark_id = StringField('mark_id', [ DataRequired(message=u'Введите ID метки.') ], render_kw = {"placeholder" : u"ID метки"})
+    mark_id = StringField('mark_id', [ DataRequired(message=u'Введите ID метки.') ], render_kw = {"placeholder" : u"*ID метки"})
     title = StringField('title', [
         DataRequired(message=u'Введите заголовок.'),
         Length(min=3, max=256, message=u'Сликшом короткий или длинный заголовок.)')
-    ], render_kw = {"placeholder" : u"Заголовок"})
-    img = StringField('image', [ DataRequired(message=u'Введите ссылку на аватарку.') ], render_kw = {"placeholder" : u"Ссылка на аватарку"})
-    video = StringField('video', [ DataRequired(message=u'Введите ссылку на видео.') ], render_kw = {"placeholder" : u"Ссылка на видео"})
-    site = StringField('site', [ DataRequired(message=u'Введите ссылку на сайт.') ], render_kw = {"placeholder" : u"Ссылка на сайт"})
+    ], render_kw = {"placeholder" : u"*Заголовок"})
+    img = StringField('image', [
+        DataRequired(message=u'Введите ссылку на аватарку.'),
+        URL(message=u'Укажите ссылку на иконку.')
+    ], render_kw = {"placeholder" : u"*Ссылка на иконку"})
+    video = StringField('video', render_kw = {"placeholder" : u"Ссылка на видео"})
+    site = StringField('site', [
+        DataRequired(message=u'Введите ссылку на сайт.'),
+        URL(message=u'Укажите ссылку на сайт.')
+    ], render_kw = {"placeholder" : u"*Ссылка на сайт"})
 
 
     def flash_errors(self):
@@ -268,12 +274,8 @@ class Add_small_mark_form(FlaskForm):
             self.mark_id.errors.append(u'ID метки -- число от 0 до 2^30.')
             return False
 
-        mark_dir = os.path.join(SMALL_MARKS_DIR, self.mark_id.data)
-        if not os.path.isdir(mark_dir):
-            os.mkdir(mark_dir)
-        mark_data_file = os.path.join(mark_dir, MARKS_DATA_FILE)
-        if os.path.isfile(mark_data_file):
-            self.mark_id.errors.append(u'ID метки уже занят.')
+        if Mark.query.filter_by(id = int(self.mark_id.data)).first() != None:
+            self.mark_id.errors.append(u'Метка с таким ID уже занята.')
             return False
 
         return True
@@ -302,3 +304,27 @@ class Generate_small_mark_form(FlaskForm):
             return False
 
         return True
+
+
+
+
+class Edit_small_mark_form(FlaskForm):
+    title = StringField('title', [
+        DataRequired(message=u'Введите заголовок.'),
+        Length(min=3, max=256, message=u'Сликшом короткий или длинный заголовок.)')
+    ], render_kw = {"placeholder" : u"*Заголовок"})
+    img = StringField('image', [
+        DataRequired(message=u'Введите ссылку на аватарку.'),
+        URL(message=u'Укажите ссылку на иконку.')
+    ], render_kw = {"placeholder" : u"*Ссылка на иконку"})
+    video = StringField('video', render_kw = {"placeholder" : u"Ссылка на видео"})
+    site = StringField('site', [
+        DataRequired(message=u'Введите ссылку на сайт.'),
+        URL(message=u'Укажите ссылку на сайт.')
+    ], render_kw = {"placeholder" : u"*Ссылка на сайт"})
+
+
+    def flash_errors(self):
+        for field, errors in self.errors.items():
+            for error in errors:
+                flash({'head' : u'Упс...', 'msg' : error }, 'error')

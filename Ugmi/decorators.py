@@ -3,6 +3,8 @@ from threading import Thread
 from flask import g, redirect, url_for, flash
 from config import ROLE_ADMIN
 from functools import wraps
+import Ugmi.models
+
 
 def async(f):
     def wrapper(*args, **kwargs):
@@ -18,4 +20,18 @@ def admin_only(f):
             flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только администраторам.' }, 'error')
             return redirect(url_for('index'))
         return f(*args, **kwargs)
+    return decorated_function
+
+
+'''in kwargs MUST BE mark_id'''
+def owner_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if (not g.user.is_authenticated):
+            flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только владельцу.' }, 'error')
+            return redirect(url_for('index'))
+        if g.user.is_admin or (Ugmi.models.Mark.query.get(kwargs['mark_id']) in g.user.marks):
+            return f(*args, **kwargs)
+        flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только владельцу.' }, 'error')
+        return redirect(url_for('index'))
     return decorated_function
