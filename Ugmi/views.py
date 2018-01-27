@@ -290,7 +290,8 @@ def add_small_mark():
             img = form.img.data,
             video = form.video.data,
             site = form.site.data,
-            user = g.user
+            user = g.user,
+            creation_time = datetime.utcnow()
         )
         db.session.add(mark)
         db.session.commit()
@@ -367,6 +368,7 @@ def edit_small_mark(mark_id):
         mark.video = form.video.data
         mark.img = form.img.data
         mark.site = form.site.data
+        mark._init_json()
         db.session.add(mark)
         db.session.commit()
         flash({ 'head' : u'Прекрасно!', 'msg' : u'Информация о метке успешно сохранена!' }, 'success')
