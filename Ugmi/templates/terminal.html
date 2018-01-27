@@ -29,21 +29,13 @@ jQuery(document).ready(function($)
             term.echo("Easy commands: clear, info, hello, whoami.");
             term.echo("\nCommands related to users 'user <command>':");
             term.echo("    info <username> -- get info about user with username = <username>.");
+            term.echo("    confirm <username> -- confirm user with username = <username>.");
             term.echo("    Commands related to setting smth 'user set <username> <command>':");
             term.echo("        marks_limit <max_marks> -- set user`s custom marks limit, whose username = <username>, to <max_marks>.")
             term.echo("        role <role> -- set user`s role, whose username = <username>, to role with id = <role>.")
             term.echo("\nCommands related to marks 'mark <command>':");
             term.echo("    info <mark_id> -- get info about mark with id = <mark_id>.")
             term.echo("    delete <mark_id> -- delete mark with id = <mark_id>.")
-        }
-
-        else if (args[0] == 'space')
-        {
-            if(need_space == 1)
-                term.echo("Space: enabled -> disabled.")
-            else
-                term.echo("Spaces disabled -> enabled.")
-            need_space = !need_space;
         }
 
         else if(args[0] == 'info')
@@ -101,6 +93,23 @@ jQuery(document).ready(function($)
                             term.echo("Status: " + response['status']);
                             term.echo("Message: " + response['msg']);
                         }
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
+            else if(args[1] == 'confirm')
+            {
+                $.ajax({
+        			url: '/ajax/user/confirm',
+        			type: 'GET',
+                    data : {
+                        username: args[2]
+                    },
+        			success: function(response){
+                        term.echo("Status: " + response['status']);
+                        term.echo("Message: " + response['msg']);
         			},
         			error: function(error){
         				term.echo(error);

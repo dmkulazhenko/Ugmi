@@ -8,7 +8,7 @@ from datetime import datetime
 from shutil import rmtree
 
 from Ugmi import app, db, lm, forms
-from config import MAIL_SUPPORT, ADMINS, ROLE_DEFAULT, ROLE_ADMIN, SMALL_MARKS_DIR
+from config import MAIL_SUPPORT, ADMINS, ROLE_DEFAULT, ROLE_ADMIN
 
 from .models import Support_msg, User, Mark
 from .emails import support_notification, internal_error_notification
@@ -295,7 +295,7 @@ def add_small_mark():
         db.session.add(mark)
         db.session.commit()
         flash({ 'head' : u'Успех!', 'msg' : u'Метка успешно добавлена!' }, 'success')
-        return redirect(url_for('add_small_mark'))
+        return redirect(url_for('list_of_marks'))
     form.flash_errors()
     return render_template('add_small_mark.html', form = form)
 
@@ -336,10 +336,9 @@ def print_small_mark(mark_id):
 @owner_only
 def delete_small_mark(mark_id):
     mark = Mark.query.get(mark_id)
+    mark.delete_files()
     db.session.delete(mark)
     db.session.commit()
-    mark_dir = os.path.join(SMALL_MARKS_DIR, str(mark_id))
-    rmtree(mark_dir)
     flash({ 'head' : u'Упспешно!', 'msg' : u'Метка успешно удалена!' }, 'success')
     return redirect(url_for('list_of_marks'))
 
@@ -350,6 +349,9 @@ def delete_small_mark(mark_id):
 @owner_only
 def about_mark(mark_id):
     mark = Mark.query.get(mark_id)
+    if mark == None:
+        flash({ 'head' : u'Упс!', 'msg' : u'Метки с таким ID не существует!' }, 'error')
+        return redirect(url_for('index'))
     return render_template('about_small_mark.html', mark = mark)
 
 

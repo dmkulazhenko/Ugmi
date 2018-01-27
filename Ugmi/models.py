@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import bcrypt, os, subprocess
+import bcrypt, os, subprocess, json
 from itsdangerous import URLSafeTimedSerializer
 from flask import url_for, send_from_directory
+from shutil import rmtree
 from datetime import datetime
 from Ugmi import db, app
 from .emails import confirm_email_notification, password_reset_notification
-from config import ROLE_DEFAULT, ROLE_USER, ROLE_ADVANCED, ROLE_COW, ROLE_ADMIN, ROLE, SMALL_MARKS_DIR, SMALL_GENERATOR, SMALL_MARKS_EXTENSION
+from config import ROLE_DEFAULT, ROLE_USER, ROLE_ADVANCED, ROLE_COW, ROLE_ADMIN, ROLE, SMALL_MARKS_DIR, SMALL_GENERATOR, SMALL_MARKS_EXTENSION, SMALL_MARKS_JSON_DIR, SMALL_MARKS_JSON_FILE
 
 
 
@@ -184,16 +185,36 @@ class Mark(db.Model):
         mark_file = os.path.join(mark_dir, str(self.id) + SMALL_MARKS_EXTENSION)
         if not os.path.isdir(mark_dir):
             os.mkdir(mark_dir)
-        if os.path.isfile(mark_file):
-            return
         subprocess.call(['java', '-jar', SMALL_GENERATOR, 'generate', str(self.id), mark_file])
-        return
 
 
     def get_mark(self):
         mark_dir = os.path.join(SMALL_MARKS_DIR, str(self.id))
         mark_file = str(self.id) + SMALL_MARKS_EXTENSION
         return send_from_directory(mark_dir, mark_file)
+
+    def delete_files(self):
+        json_mark_dir = os.path.join(SMALL_MARKS_JSON_DIR, str(self.id))
+        if(os.path.isdir(json_mark_dir)):
+            rmtree(json_mark_dir)
+        mark_dir = os.path.join(SMALL_MARKS_DIR, str(self.id))
+        if(os.path.isdir(mark_dir)):
+            rmtree(mark_dir)
+
+
+    #External server:
+    def _init_json(self):
+        json_mark_dir = os.path.join(SMALL_MARKS_JSON_DIR, str(self.id))
+        json_mark_file = os.path.join(json_mark_dir, SMALL_MARKS_JSON_FILE)
+        if not os.path.isdir(json_mark_dir):
+            os.mkdir(json_mark_dir)
+        data = {}
+        data['name'] = self.title
+        data['img'] = self.img
+        data['site'] = self.site
+        data['res'] = self.video
+        with open(json_mark_file, 'w') as json_file:
+            json_file.write( json.dumps(data) )
 
 
     #AJAX:
@@ -212,6 +233,7 @@ class Mark(db.Model):
     def __init__(self, **kwargs):
         super(Mark, self).__init__(**kwargs)
         self.generate_mark()
+        self._init_json()
 
     def __repr__(self):
         return '<Mark %r title %r by user %r>' % (self.id, self.title, self.user_id)

@@ -74,3 +74,8 @@ LOG_FILE = 'ugmi.log'
 SMALL_GENERATOR = os.path.join(marks_dir, 'small_generator.jar')
 SMALL_MARKS_DIR = os.path.join(marks_dir, 'small')
 SMALL_MARKS_EXTENSION = '.png'
+if not DEBUG:
+    SMALL_MARKS_JSON_DIR = '/var/www/html/data'
+else:
+    SMALL_MARKS_JSON_DIR = SMALL_MARKS_DIR
+SMALL_MARKS_JSON_FILE = 'data.json'

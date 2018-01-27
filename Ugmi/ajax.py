@@ -24,6 +24,27 @@ def ajax_get_info_about_user(username):
     data['msg'] = None
     return jsonify(data)
 
+@app.route('/ajax/user/confirm')
+def ajax_confirm_user():
+    data = {}
+    username = request.args.get('username')
+    user = User.query.filter_by(username = username).first()
+    if not user:
+        data['status'] = 'error'
+        data['msg'] = "User with username '" + username + "' not found."
+        return jsonify(data)
+    if user.confirmed == False:
+        user.confirmed = True
+        db.session.add(user)
+        db.session.commit()
+        data['status'] = 'success'
+        data['msg'] = 'User ' + username + ' successfully confirmed.'
+    else:
+        data['status'] = 'error'
+        data['msg'] = 'User ' + username + ' already confirmed.'
+    return jsonify(data)
+
+
 #Set:
 @app.route('/ajax/user/set/role')
 @admin_only
@@ -100,10 +121,9 @@ def ajax_delete_mark():
         data['status'] = 'error'
         data['msg'] = "Mark with id '" + str(mark_id) + "' not found."
         return jsonify(data)
+    mark.delete_files()
     db.session.delete(mark)
     db.session.commit()
-    mark_dir = os.path.join(SMALL_MARKS_DIR, str(mark_id))
-    rmtree(mark_dir)
     data['status'] = 'success'
     data['msg'] = "Mark with id '" + str(mark_id) + "' successfully deleted."
     return jsonify(data)
