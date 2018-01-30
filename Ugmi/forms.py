@@ -270,8 +270,8 @@ class Add_small_mark_form(FlaskForm):
             self.mark_id.errors.append(u'ID метки -- число.')
             return False
 
-        if(int(self.mark_id.data) < 0 or int(self.mark_id.data) > 2**30):
-            self.mark_id.errors.append(u'ID метки -- число от 0 до 2^30.')
+        if(int(self.mark_id.data) < 1 or int(self.mark_id.data) >= 2**30):
+            self.mark_id.errors.append(u'ID метки -- число от 1 до 2^30-1.')
             return False
 
         if Mark.query.filter_by(id = int(self.mark_id.data)).first() != None:

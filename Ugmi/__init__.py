@@ -23,4 +23,4 @@ lm.login_view = 'login'
 init_Ugmi()
 
 
-from Ugmi import views, ajax, models
+from Ugmi import views, mark_views, ajax, models

@@ -5,6 +5,7 @@ project_dir = os.path.dirname(__file__)
 base_dir = os.path.join(project_dir, 'Ugmi')
 database_dir = os.path.join(base_dir, 'database')
 marks_dir = os.path.join(base_dir, 'marks')
+temp_dir = os.path.join(base_dir, 'temp')
 
 #Flask config
 DEBUG = True

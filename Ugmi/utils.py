@@ -2,7 +2,7 @@
 import os
 from urllib.parse import urlparse, urljoin
 from flask import request, url_for
-from config import SMALL_MARKS_DIR
+from config import SMALL_MARKS_DIR, temp_dir
 
 
 def is_safe_url(target):
@@ -15,3 +15,5 @@ def is_safe_url(target):
 def init_Ugmi():
     if not os.path.isdir(SMALL_MARKS_DIR):
         os.mkdir(SMALL_MARKS_DIR)
+    if not os.path.isdir(temp_dir):
+        os.mkdir(temp_dir)

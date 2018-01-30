@@ -112,3 +112,6 @@ config.py
 
 #marks cache
 /Ugmi/marks/small
+
+#temp
+/Ugmi/temp

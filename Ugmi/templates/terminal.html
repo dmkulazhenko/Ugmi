@@ -28,12 +28,15 @@ jQuery(document).ready(function($)
         {
             term.echo("Easy commands: clear, info, hello, whoami.");
             term.echo("\nCommands related to users 'user <command>':");
+            term.echo("    list -- get a list of users.");
             term.echo("    info <username> -- get info about user with username = <username>.");
             term.echo("    confirm <username> -- confirm user with username = <username>.");
+            term.echo("    delete <username> -- delete user with username = <username>. BE CAREFUL! THIS ACTION DELETE ALL MARKS OF THIS USER!")
             term.echo("    Commands related to setting smth 'user set <username> <command>':");
             term.echo("        marks_limit <max_marks> -- set user`s custom marks limit, whose username = <username>, to <max_marks>.")
             term.echo("        role <role> -- set user`s role, whose username = <username>, to role with id = <role>.")
             term.echo("\nCommands related to marks 'mark <command>':");
+            term.echo("    list -- get a list of marks.");
             term.echo("    info <mark_id> -- get info about mark with id = <mark_id>.")
             term.echo("    delete <mark_id> -- delete mark with id = <mark_id>.")
         }
@@ -99,10 +102,53 @@ jQuery(document).ready(function($)
         			}
         		});
             }
+            else if(args[1] == 'list')
+            {
+                term.echo("id | username | name | email | role | marks/max_marks");
+                $.ajax({
+        			url: '/ajax/user/list',
+        			type: 'GET',
+        			success: function(response){
+                        if(response['status'] == 'success')
+                        {
+                            for(var i = 0 ; i < response['users'].length ; i ++)
+                            {
+                                var user = response['users'][i]
+                                term.echo(user['id'] + ' | ' + user['username'] + ' | ' + user['name'] + ' | ' + user['email'] + ' | ' + user['role'] + ' | ' + user['have_marks'] + '/' + user['max_marks']);
+                            }
+                        }
+                        else
+                        {
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+                        }
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
             else if(args[1] == 'confirm')
             {
                 $.ajax({
         			url: '/ajax/user/confirm',
+        			type: 'GET',
+                    data : {
+                        username: args[2]
+                    },
+        			success: function(response){
+                        term.echo("Status: " + response['status']);
+                        term.echo("Message: " + response['msg']);
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
+            else if(args[1] == 'delete')
+            {
+                $.ajax({
+        			url: '/ajax/user/delete',
         			type: 'GET',
                     data : {
                         username: args[2]
@@ -178,6 +224,32 @@ jQuery(document).ready(function($)
                             term.echo("Video: " + response['video']);
                             term.echo("Views: " + response['views']);
                             term.echo("Owner: " + response['owner']);
+                        }
+                        else
+                        {
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+                        }
+        			},
+        			error: function(error){
+        				term.echo(error);
+        			}
+        		});
+            }
+            else if(args[1] == 'list')
+            {
+                term.echo("id | title | views | author_username | author_email");
+                $.ajax({
+        			url: '/ajax/mark/list',
+        			type: 'GET',
+        			success: function(response){
+                        if(response['status'] == 'success')
+                        {
+                            for(var i = 0 ; i < response['marks'].length ; i ++)
+                            {
+                                var mark = response['marks'][i]
+                                term.echo(mark['id'] + ' | ' + mark['title'] + ' | ' + mark['views'] + ' | ' + mark['user']['username'] + ' | ' + mark['user']['email']);
+                            }
                         }
                         else
                         {

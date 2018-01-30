@@ -109,7 +109,7 @@ class User(db.Model):
                 max_age = expiration
             )
         except:
-            return False
+            return None
         return email
 
 
@@ -132,7 +132,7 @@ class User(db.Model):
                 max_age = expiration
             )
         except:
-            return False
+            return None
         return email
 
 
