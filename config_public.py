@@ -15,12 +15,15 @@ SECRET_KEY = ''
 WTF_CSRF_SECRET_KEY = ''
 
 #Hash salts
-SECRET_CONFIRM_EMAIL_SALT = ''
+SECRET_CONFIRM_EMAIL_SALT  = ''
 SECRET_PASSWORD_RESET_SALT = ''
+SECRET_API_TOKEN_SALT      = ''
+
 
 #Serializer secret keys
-SECRET_CONFIRM_EMAIL_KEY = ''
+SECRET_CONFIRM_EMAIL_KEY  = ''
 SECRET_PASSWORD_RESET_KEY = ''
+SECRET_API_TOKEN_KEY      = ''
 
 #SQLAlchemy config
 if not DEBUG:
@@ -30,12 +33,19 @@ else:
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+#Tokens
+TOKEN_EXPRIRATION_TIME     = 3600
+API_TOKEN_EXPRIRATION_TIME = 2592000
+
+#Email confirm
+EMAIL_CONFIRM_TRUE  = 1
+EMAIL_CONFIRM_FALSE = 0
 
 #Email server config
-MAIL_SERVER = ''
-MAIL_PORT = 444
-MAIL_USE_TLS = False
-MAIL_USE_SSL = False
+MAIL_SERVER   = 'smtp.yandex.ru'
+MAIL_PORT     = 465
+MAIL_USE_TLS  = False
+MAIL_USE_SSL  = True
 MAIL_USERNAME = 'no-reply@ugmi.me'
 MAIL_PASSWORD = ''
 
@@ -46,11 +56,11 @@ ADMINS = ['dimkaxdx@gmail.com', 'derovi@list.ru', 'vladislav.oleshko@gmail.com',
 MAIL_SUPPORT = 'support@ugmi.me'
 
 #Roles
-ROLE_DEFAULT = 0
-ROLE_USER = 1
+ROLE_DEFAULT  = 0
+ROLE_USER     = 1
 ROLE_ADVANCED = 2
-ROLE_COW = 3
-ROLE_ADMIN = 4
+ROLE_COW      = 3
+ROLE_ADMIN    = 4
 ROLE = {
     'MAX_MARKS' : {
         ROLE_DEFAULT : 2,
@@ -72,8 +82,8 @@ ROLE = {
 LOG_FILE = 'ugmi.log'
 
 #Small marks
-SMALL_GENERATOR = os.path.join(marks_dir, 'small_generator.jar')
-SMALL_MARKS_DIR = os.path.join(marks_dir, 'small')
+SMALL_GENERATOR       = os.path.join(marks_dir, 'small_generator.jar')
+SMALL_MARKS_DIR       = os.path.join(marks_dir, 'small')
 SMALL_MARKS_EXTENSION = '.png'
 if not DEBUG:
     SMALL_MARKS_JSON_DIR = '/var/www/html/data'
