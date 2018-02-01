@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import string, re, bcrypt, os
+import re, bcrypt
 from datetime import datetime
 from flask import flash, Markup, url_for
 from flask_wtf import FlaskForm
 from wtforms import TextAreaField, StringField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, URL
-from .models import User, Mark
+from .models.user import User
+from .models.mark import Mark
 
 
 
@@ -271,7 +272,7 @@ class Add_small_mark_form(FlaskForm):
             return False
 
         if(int(self.mark_id.data) < 1 or int(self.mark_id.data) >= 2**30):
-            self.mark_id.errors.append(u'ID метки -- число от 1 до 2^30-1.')
+            self.mark_id.errors.append(u'ID метки -- число от 1 до 1073741823.')
             return False
 
         if Mark.query.filter_by(id = int(self.mark_id.data)).first() != None:

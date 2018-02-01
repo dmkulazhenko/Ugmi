@@ -3,7 +3,7 @@ from threading import Thread
 from flask import g, redirect, url_for, flash
 from config import ROLE_ADMIN
 from functools import wraps
-import Ugmi.models
+from .models.mark import Mark
 
 
 def async(f):
@@ -30,7 +30,7 @@ def owner_only(f):
         if (not g.user.is_authenticated):
             flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только владельцу.' }, 'error')
             return redirect(url_for('index'))
-        if g.user.is_admin or (Ugmi.models.Mark.query.get(kwargs['mark_id']) in g.user.marks):
+        if g.user.is_admin or (Mark.query.get(kwargs['mark_id']) in g.user.marks):
             return f(*args, **kwargs)
         flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только владельцу.' }, 'error')
         return redirect(url_for('index'))

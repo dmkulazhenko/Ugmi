@@ -5,7 +5,6 @@ from flask_mail import Message
 from Ugmi import mail, app
 
 from .decorators import async
-from config import ADMINS, MAIL_SUPPORT
 
 
 @async
@@ -29,7 +28,7 @@ def support_notification(support_msg):
     )
     send_email(
         subject = u'[UGMI] Поддержка',
-        recipients = ADMINS + [MAIL_SUPPORT],
+        recipients = app.config['ADMINS'] + [app.config['MAIL_SUPPORT']],
         text_body = render_template('admin_support_notification_email.txt', support_msg=support_msg),
         html_body = render_template('admin_support_notification_email.html', support_msg=support_msg)
     )
@@ -38,7 +37,7 @@ def support_notification(support_msg):
 def internal_error_notification():
     send_email(
         subject = u'[UGMI] СЕРВАК ЛЕГ!',
-        recipients = ADMINS,
+        recipients = app.config['ADMINS'],
         text_body = render_template('admin_internal_error_notification_email.txt'),
         html_body = render_template('admin_internal_error_notification_email.html')
     )

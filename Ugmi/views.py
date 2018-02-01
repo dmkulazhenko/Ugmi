@@ -6,9 +6,9 @@ from datetime import datetime
 from shutil import rmtree
 
 from Ugmi import app, db, lm, forms
-from config import ADMINS, ROLE_DEFAULT, ROLE_ADMIN
 
-from .models import Support_msg, User
+from .models.user import User
+from .models.support_msg import Support_msg
 from .emails import support_notification, internal_error_notification
 from .utils import is_safe_url
 from .decorators import admin_only
@@ -20,10 +20,6 @@ from .decorators import admin_only
 def not_found_error(error):
     return render_template('404.html'), 404
 
-
-@app.errorhandler(400)
-def internal_error(error):
-    return render_template('500.html'), 400
 
 
 @app.errorhandler(500)
@@ -129,9 +125,9 @@ def beta():
 def download():
     form = forms.Registration_form()
     if form.validate_on_submit():
-        role = ROLE_DEFAULT
-        if form.email.data in ADMINS:
-            role = ROLE_ADMIN
+        role = app.config['ROLE_DEFAULT']
+        if form.email.data in app.config['ADMINS']:
+            role = app.config['ROLE_ADMIN']
         user = User(name = form.name.data, email = form.email.data, username = form.username.data,
             password = form.password.data, role = role)
         db.session.add(user)
@@ -167,7 +163,7 @@ def confirm_email(token):
     if user.confirmed:
         flash({'head' : u'Все хорошо!', 'msg' : u'Email уже подтвержден. Вы можете авторизоваться.' }, '')
     else:
-        user.confirmed = True
+        user.confirm_email()
         db.session.add(user)
         db.session.commit()
         flash({'head' : u'Прекрасно!', 'msg' : u'Email успешно подтвержден! Вы можете авторизоваться.' }, 'success')

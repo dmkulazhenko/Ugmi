@@ -1,11 +1,10 @@
-import os
+# -*- coding: utf-8 -*-
 from flask import jsonify, request
-from shutil import rmtree
 
 from Ugmi import app, db
-from config import SMALL_MARKS_DIR
 
-from .models import Mark, User
+from .models.user import User
+from .models.mark import Mark
 from .decorators import admin_only
 
 

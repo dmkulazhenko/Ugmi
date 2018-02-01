@@ -4,7 +4,7 @@ from flask_login import login_required
 
 from Ugmi import app, db, forms
 
-from .models import Mark
+from .models.mark import Mark
 from .decorators import owner_only
 
 
