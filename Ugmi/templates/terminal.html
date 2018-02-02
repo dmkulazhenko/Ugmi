@@ -40,7 +40,6 @@ jQuery(document).ready(function($)
             term.echo("    info <mark_id> -- get info about mark with id = <mark_id>.")
             term.echo("    delete <mark_id> -- delete mark with id = <mark_id>.")
         }
-
         else if(args[0] == 'info')
         {
             term.echo(term.greetings);
@@ -130,78 +129,102 @@ jQuery(document).ready(function($)
             }
             else if(args[1] == 'confirm')
             {
-                $.ajax({
-        			url: '/ajax/user/confirm',
-        			type: 'GET',
-                    data : {
-                        username: args[2]
-                    },
-        			success: function(response){
-                        term.echo("Status: " + response['status']);
-                        term.echo("Message: " + response['msg']);
-        			},
-        			error: function(error){
-        				term.echo(error);
-        			}
-        		});
+                if( args.length < 3 )
+                    term.echo("Where is username?");
+                else
+                    $.ajax({
+            			url: '/ajax/user/confirm',
+            			type: 'GET',
+                        data : {
+                            username: args[2]
+                        },
+            			success: function(response){
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+            			},
+            			error: function(error){
+            				term.echo(error);
+            			}
+            		});
             }
             else if(args[1] == 'delete')
             {
-                $.ajax({
-        			url: '/ajax/user/delete',
-        			type: 'GET',
-                    data : {
-                        username: args[2]
-                    },
-        			success: function(response){
-                        term.echo("Status: " + response['status']);
-                        term.echo("Message: " + response['msg']);
-        			},
-        			error: function(error){
-        				term.echo(error);
-        			}
-        		});
+                if( args.length < 3 )
+                    term.echo("Where is username?");
+                else
+                    $.ajax({
+            			url: '/ajax/user/delete',
+            			type: 'GET',
+                        data : {
+                            username: args[2]
+                        },
+            			success: function(response){
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+            			},
+            			error: function(error){
+            				term.echo(error);
+            			}
+            		});
             }
             else if(args[1] == 'set')
             {
-                var username = args[2];
-                if(args[3] == 'role')
+                if( args.length < 3 )
+                    term.echo("Where is username?");
+                else
                 {
-                    var role_id = args[4];
-                    $.ajax({
-            			url: '/ajax/user/set/role',
-            			type: 'GET',
-                        data : {
-                            username: username,
-                            role_id: role_id
-                        },
-            			success: function(response){
-                            term.echo("Status: " + response['status']);
-                            term.echo("Message: " + response['msg']);
-            			},
-            			error: function(error){
-            				term.echo(error);
-            			}
-            		});
-                }
-                else if(args[3] == 'marks_limit')
-                {
-                    var max_marks = args[4];
-                    $.ajax({
-            			url: '/ajax/user/set/custom_marks_limit',
-            			type: 'GET',
-                        data : {
-                            username: username,
-                            max_marks: max_marks
-                        },
-            			success: function(response){
-                            term.echo("Status: " + response['status']);
-                            term.echo("Message: " + response['msg']);
-            			},
-            			error: function(error){
-            				term.echo(error);
-            			}
-            		});
+                    var username = args[2];
+                    if( args.length < 4 )
+                        term.echo("What u want to set?");
+                    else
+                    {
+                        if(args[3] == 'role')
+                        {
+                            if( args.length < 5 )
+                                term.echo("Role value?");
+                            else
+                            {
+                                $.ajax({
+                        			url: '/ajax/user/set/role',
+                        			type: 'GET',
+                                    data : {
+                                        username: username,
+                                        role_id: args[4]
+                                    },
+                        			success: function(response){
+                                        term.echo("Status: " + response['status']);
+                                        term.echo("Message: " + response['msg']);
+                        			},
+                        			error: function(error){
+                        				term.echo(error);
+                        			}
+                        		});
+                            }
+                        }
+                        else if(args[3] == 'marks_limit')
+                        {
+                            if( args.length < 5 )
+                                term.echo("What about marks limit?");
+                            else
+                            {
+                                $.ajax({
+                        			url: '/ajax/user/set/custom_marks_limit',
+                        			type: 'GET',
+                                    data : {
+                                        username: username,
+                                        max_marks: args[4]
+                                    },
+                        			success: function(response){
+                                        term.echo("Status: " + response['status']);
+                                        term.echo("Message: " + response['msg']);
+                        			},
+                        			error: function(error){
+                        				term.echo(error);
+                        			}
+                        		});
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -210,31 +233,36 @@ jQuery(document).ready(function($)
         {
             if(args[1] == 'info')
             {
-                $.ajax({
-        			url: '/ajax/mark/'+args[2],
-        			type: 'GET',
-        			success: function(response){
-                        if(response['status'] == 'success')
-                        {
-                            term.echo("Status: " + response['status'])
-                            term.echo("ID: " + response['id']);
-                            term.echo("Title: " + response['title']);
-                            term.echo("Icon: " + response['img']);
-                            term.echo("Site: " + response['site']);
-                            term.echo("Video: " + response['video']);
-                            term.echo("Views: " + response['views']);
-                            term.echo("Owner: " + response['owner']);
-                        }
-                        else
-                        {
-                            term.echo("Status: " + response['status']);
-                            term.echo("Message: " + response['msg']);
-                        }
-        			},
-        			error: function(error){
-        				term.echo(error);
-        			}
-        		});
+                if( args.length < 3 )
+                    term.echo("Mark ID?");
+                else
+                {
+                    $.ajax({
+            			url: '/ajax/mark/'+args[2],
+            			type: 'GET',
+            			success: function(response){
+                            if(response['status'] == 'success')
+                            {
+                                term.echo("Status: " + response['status'])
+                                term.echo("ID: " + response['id']);
+                                term.echo("Title: " + response['title']);
+                                term.echo("Icon: " + response['img']);
+                                term.echo("Site: " + response['site']);
+                                term.echo("Video: " + response['video']);
+                                term.echo("Views: " + response['views']);
+                                term.echo("Owner: " + response['owner']);
+                            }
+                            else
+                            {
+                                term.echo("Status: " + response['status']);
+                                term.echo("Message: " + response['msg']);
+                            }
+            			},
+            			error: function(error){
+            				term.echo(error);
+            			}
+            		});
+                }
             }
             else if(args[1] == 'list')
             {
@@ -264,20 +292,25 @@ jQuery(document).ready(function($)
             }
             else if(args[1] == 'delete')
             {
-                $.ajax({
-        			url: '/ajax/mark/delete',
-        			type: 'GET',
-                    data : {
-                        mark_id: args[2]
-                    },
-        			success: function(response){
-                        term.echo("Status: " + response['status']);
-                        term.echo("Message: " + response['msg']);
-        			},
-        			error: function(error){
-        				term.echo(error);
-        			}
-        		});
+                if( args.length < 3 )
+                    term.echo("Mark ID?");
+                else
+                {
+                    $.ajax({
+            			url: '/ajax/mark/delete',
+            			type: 'GET',
+                        data : {
+                            mark_id: args[2]
+                        },
+            			success: function(response){
+                            term.echo("Status: " + response['status']);
+                            term.echo("Message: " + response['msg']);
+            			},
+            			error: function(error){
+            				term.echo(error);
+            			}
+            		});
+                }
             }
 
         }
@@ -291,7 +324,7 @@ jQuery(document).ready(function($)
 
     },
     {
-        greetings:"\n                                                                                                              \n                                                                                                              \n                                                                                                              \n    ;@@@@@@@@@:   X@@@@@@B           ,hHM#@@#MH&MA          G@@@@@@@A        @@@@@@@@9       ;@@@@@@@@@A      \n      ,#@@@2        :@&            3@@#2     2@@@S            2#9@@@B       Gh#@@@X             #@@@h         \n      s@@@@          @           S#@@H        ;#M,            5H,@@@#:     G&X@@@M,            ,@@@#,         \n      &@@@B         iH          :@@@B          AA             AX H@@@5    9& M@@@A             3@@@H          \n     .@@@@h         &9          #@@@;                        .M. X@@@&   hA  @@@@2             H@@@3          \n     X@@@@;        .B:         2@@@H                         i&  ;@@@@  XA  :@@@@             :#@@@,          \n     H@@@H         i&          G@@@&     ,A#@@@@#HG          Br  .@@@@5&G   h@@@9             9@@@M           \n    ,#@@@5         M;          3@@@&       i@@@#            ;B    @@@@@h    @@@@;             #@@@&           \n    :#@@@3       .B9            M@@B       H@@@2            G&    B@@@G    5@@@B             S@@@@i           \n     h@@@@&,  .5HMr              #@@A     S@@@#,           5#H    3@@G     H@@@&             A@@@@            \n       9HM#@#MH9.                 ;GB#@@#MH&S           3@@@@@@M, s@&   H@@@@@@@@B        M@@@@@@@@M.         \n                                                                                                              \n                                                                                                              \n                                                                                                              \n                                                                                                              \nUgmi terminal v1.0. Type 'help' for help.\n\n",
+        greetings:"\n                                                                                                              \n                                                                                                              \n                                                                                                              \n    ;@@@@@@@@@:   X@@@@@@B           ,hHM#@@#MH&MA          G@@@@@@@A        @@@@@@@@9       ;@@@@@@@@@A      \n      ,#@@@2        :@&            3@@#2     2@@@S            2#9@@@B       Gh#@@@X             #@@@h         \n      s@@@@          @           S#@@H        ;#M,            5H,@@@#:     G&X@@@M,            ,@@@#,         \n      &@@@B         iH          :@@@B          AA             AX H@@@5    9& M@@@A             3@@@H          \n     .@@@@h         &9          #@@@;                        .M. X@@@&   hA  @@@@2             H@@@3          \n     X@@@@;        .B:         2@@@H                         i&  ;@@@@  XA  :@@@@             :#@@@,          \n     H@@@H         i&          G@@@&     ,A#@@@@#HG          Br  .@@@@5&G   h@@@9             9@@@M           \n    ,#@@@5         M;          3@@@&       i@@@#            ;B    @@@@@h    @@@@;             #@@@&           \n    :#@@@3       .B9            M@@B       H@@@2            G&    B@@@G    5@@@B             S@@@@i           \n     h@@@@&,  .5HMr              #@@A     S@@@#,           5#H    3@@G     H@@@&             A@@@@            \n       9HM#@#MH9.                 ;GB#@@#MH&S           3@@@@@@M, s@&   H@@@@@@@@B        M@@@@@@@@M.         \n                                                                                                              \n                                                                                                              \n                                                                                                              \n                                                                                                              \nUgmi terminal v1.3. Type 'help' for help.\n\n",
         prompt: "{{g.user.username}}>",
         onBlur: function() {
             // prevent loosing focus
