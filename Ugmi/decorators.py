@@ -35,3 +35,13 @@ def owner_only(f):
         flash({'head' : u'Ты не пройдешь!', 'msg' : u'Доступ только владельцу.' }, 'error')
         return redirect(url_for('index'))
     return decorated_function
+
+
+'''Wrapper for decorators with args.'''
+def parametrized(dec):
+    @wraps(dec)
+    def layer(*args, **kwargs):
+        def repl(f):
+            return dec(f, *args, **kwargs)
+        return repl
+    return layer
