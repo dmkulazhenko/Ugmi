@@ -27,8 +27,7 @@ def add_small_mark():
             user = g.user,
             creation_time = datetime.utcnow()
         )
-        db.session.add(mark)
-        db.session.commit()
+        mark.write_to_db()
         flash({ 'head' : u'Успех!', 'msg' : u'Метка успешно добавлена!' }, 'success')
         return redirect(url_for('list_of_marks'))
     form.flash_errors()

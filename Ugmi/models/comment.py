@@ -16,6 +16,10 @@ class Comment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     mark_id = db.Column(db.Integer, db.ForeignKey('mark.id'))
 
+    def write_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
 
     def __repr__(self):
         return '<Comment %r with %r stars, for mark %r by user %r>' % (self.id, self.stars, self.mark_id, self.user.username)

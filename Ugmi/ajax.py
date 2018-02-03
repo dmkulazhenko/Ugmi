@@ -56,8 +56,7 @@ def ajax_confirm_user():
         return jsonify(data)
     if user.confirmed == False:
         user.confirmed = True
-        db.session.add(user)
-        db.session.commit()
+        user.write_to_db()
         data['status'] = 'success'
         data['msg'] = 'User ' + username + ' successfully confirmed.'
     else:
@@ -108,8 +107,7 @@ def ajax_set_role_for_user():
     role_was = user.role
     user.role = role_id
     user.custom_marks_limit = None
-    db.session.add(user)
-    db.session.commit()
+    user.write_to_db()
     data['status'] = 'success'
     data['msg'] = username +'`s role: ' + str(role_was) + ' -> ' + str(role_id) +'.'
     return jsonify(data)
@@ -131,8 +129,7 @@ def ajax_set_custom_marks_limit_for_user():
         data['msg'] = "Marks limit can't be less than 0."
         return jsonify(data)
     user.custom_marks_limit = max_marks
-    db.session.add(user)
-    db.session.commit()
+    user.write_to_db()
     data['status'] = 'success'
     data['msg'] = username +'`s marks limit successfully updated.'
     return jsonify(data)

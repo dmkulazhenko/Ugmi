@@ -13,5 +13,9 @@ class Support_msg(db.Model):
     msg = db.Column(db.Text)
     date = db.Column(db.DateTime)
 
+    def write_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
     def __repr__(self):
         return '<Support_msg from %r with email %r left %r>' % (self.name, self.email, self.date)

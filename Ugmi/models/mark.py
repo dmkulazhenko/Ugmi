@@ -30,6 +30,10 @@ class Mark(db.Model):
         '''Returns path to mark file.'''
         return os.path.join(os.path.join(app.config['SMALL_MARKS_DIR'], str(self.id)), str(self.id) + app.config['SMALL_MARKS_EXTENSION'])
 
+    def write_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
 
     def generate_mark(self):
         mark_dir = os.path.join(app.config['SMALL_MARKS_DIR'], str(self.id))

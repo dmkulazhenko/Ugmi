@@ -2,6 +2,7 @@
 import bcrypt, json
 from itsdangerous import BadSignature, SignatureExpired
 from flask import url_for
+from datetime import datetime
 from Ugmi import db, app, email_confirm_serializer, password_reset_serializer, api_token_serializer
 from Ugmi.emails import confirm_email_notification, password_reset_notification
 
@@ -74,6 +75,10 @@ class User(db.Model):
         except:
             return unicode(self.id) #python2
 
+    def write_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
 
     def auth(self, password):
         '''Returns true if password match for current user.'''
@@ -86,6 +91,8 @@ class User(db.Model):
         token = email_confirm_serializer.dumps(self.email, salt = app.config['SECRET_CONFIRM_EMAIL_SALT'])
         confirm_email_url = url_for('confirm_email', token = token, _external = True)
         confirm_email_notification(user = self, confirm_email_url = confirm_email_url)
+        self.last_email_confirm = datetime.utcnow()
+        self.write_to_db()
 
     @staticmethod
     def check_email_confirm_token(token, expiration = app.config['TOKEN_EXPRIRATION_TIME']):
@@ -111,6 +118,8 @@ class User(db.Model):
         token = password_reset_serializer.dumps(self.email, salt = app.config['SECRET_PASSWORD_RESET_SALT'])
         password_reset_url = url_for('reset_password_confirm', token = token, _external = True)
         password_reset_notification(user = self, password_reset_url = password_reset_url)
+        self.last_password_reset = datetime.utcnow()
+        self.write_to_db()
 
     @staticmethod
     def check_password_reset_token(token, expiration = app.config['TOKEN_EXPRIRATION_TIME']):

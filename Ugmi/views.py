@@ -43,8 +43,7 @@ def before_request():
     g.user = current_user
     if g.user.is_authenticated:
         g.user.last_seen = datetime.utcnow()
-        db.session.add(g.user)
-        db.session.commit()
+        g.user.write_to_db()
 
 
 
@@ -55,8 +54,7 @@ def index():
     form = forms.Contact_us_form()
     if form.validate_on_submit():
         msg = Support_msg(name = form.name.data, email = form.email.data, phone = form.phone.data, msg = form.msg.data, date = datetime.utcnow())
-        db.session.add(msg)
-        db.session.commit()
+        msg.write_to_db()
         support_notification(msg)
         flash({'head' : u'Спасибо!', 'msg' : u'Ваше сообщение доставлено.' }, 'success')
         return redirect(url_for('index'))
@@ -72,8 +70,7 @@ def contacts():
     if form.validate_on_submit():
         msg = Support_msg(name = form.name.data, email = form.email.data, phone = form.phone.data,
             msg = form.msg.data, date = datetime.utcnow())
-        db.session.add(msg)
-        db.session.commit()
+        msg.write_to_db()
         support_notification(msg)
         flash({'head' : u'Спасибо!', 'msg' : u'Ваше сообщение доставлено.' }, 'success')
         return redirect(url_for('contacts'))
@@ -89,8 +86,7 @@ def team():
     if form.validate_on_submit():
         msg = Support_msg(name = form.name.data, email = form.email.data, phone = form.phone.data,
             msg = form.msg.data, date = datetime.utcnow())
-        db.session.add(msg)
-        db.session.commit()
+        msg.write_to_db()
         support_notification(msg)
         flash({'head' : u'Спасибо!', 'msg' : u'Ваше сообщение доставлено.' }, 'success')
         return redirect(url_for('team'))
@@ -130,8 +126,7 @@ def download():
             role = app.config['ROLE_ADMIN']
         user = User(name = form.name.data, email = form.email.data, username = form.username.data,
             password = form.password.data, role = role)
-        db.session.add(user)
-        db.session.commit()
+        user.write_to_db()
         flash({'head' : u'Ура!', 'msg' : u'Вы успешно зарегистрированы.' }, 'success')
 
         user.send_email_confirm_token()
@@ -164,8 +159,7 @@ def confirm_email(token):
         flash({'head' : u'Все хорошо!', 'msg' : u'Email уже подтвержден. Вы можете авторизоваться.' }, '')
     else:
         user.confirm_email()
-        db.session.add(user)
-        db.session.commit()
+        user.write_to_db()
         flash({'head' : u'Прекрасно!', 'msg' : u'Email успешно подтвержден! Вы можете авторизоваться.' }, 'success')
     return redirect(url_for('login'))
 
@@ -185,9 +179,6 @@ def resend_confirmation(username):
         flash({'head' : u'Упс...', 'msg' : u'Следующие письмо с интервалом в 15 минуток.' }, 'error')
         return redirect(url_for('login'))
     user.send_email_confirm_token()
-    user.last_email_confirm = datetime.utcnow()
-    db.session.add(user)
-    db.session.commit()
     flash({'head' : u'Успех!', 'msg' : u'Подтверждение отправлено еще раз. Не забудьте проверить спам.' }, 'success')
     return redirect(url_for('login'))
 
@@ -212,8 +203,7 @@ def reset_password_confirm(token):
     form = forms.Password_reset_set_form()
     if form.validate_on_submit():
         user.password = form.password.data
-        db.session.add(user)
-        db.session.commit()
+        user.write_to_db()
         flash({'head' : u'Ура!', 'msg' : u'Пароль успешно изменен.' }, 'success')
         return redirect(url_for('login'))
     form.flash_errors()
@@ -229,9 +219,6 @@ def reset_password():
     if form.validate_on_submit():
         user = load_user(form.id.data)
         user.send_password_reset_token()
-        user.last_password_reset = datetime.utcnow()
-        db.session.add(user)
-        db.session.commit()
         flash({'head' : u'Отлично!', 'msg' : u'Письмо для восстановления пароля отправлено на ваш email.'}, 'success')
         return redirect(url_for('login'))
     form.flash_errors()
