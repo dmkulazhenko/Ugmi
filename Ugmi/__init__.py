@@ -29,4 +29,4 @@ init_Ugmi()
 
 
 from Ugmi import views, mark_views, ajax, api
-from Ugmi.models import user, mark, support_msg
+from Ugmi.models import user, mark, support_msg, comment

@@ -22,6 +22,7 @@ class User(db.Model):
     last_password_reset = db.Column(db.DateTime, default = None)
     last_seen = db.Column(db.DateTime, default = None)
     marks = db.relationship('Mark', backref = 'user')
+    comments = db.relationship('Comment', backref = 'user')
 
 
     @property

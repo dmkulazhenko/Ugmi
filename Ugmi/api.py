@@ -5,6 +5,8 @@ from functools import wraps
 from Ugmi import app, db
 
 from .models.user import User
+from .models.comment import Comment
+from .models.mark import Mark
 from .decorators import parametrized
 
 
@@ -80,12 +82,12 @@ def api_register_user():
     if( len(password) < 8 or len(password) > 256 ):
         ok = False
     if not ok:
-        return jsonify(status = 'error', msg = 'Incorrect request.', code = 2), 400
+        return jsonify(status = 'error', msg = 'Incorrect request.', code = 1), 400
 
     if User.query.filter_by(username = username).first() is not None:
-        return jsonify(status = 'error', msg = 'Username already taken.', code = 3), 400
+        return jsonify(status = 'error', msg = 'Username already taken.', code = 2), 400
     if User.query.filter_by(email = email).first() is not None:
-        return jsonify(status = 'error', msg = 'Email already registered.', code = 4), 400
+        return jsonify(status = 'error', msg = 'Email already registered.', code = 3), 400
 #END VALIDATION
     password = bcrypt.hashpw(bytes(password, 'utf-8'), bcrypt.gensalt()).decode('utf-8')
     role = app.config['ROLE_DEFAULT']
@@ -101,7 +103,7 @@ def api_register_user():
 
 
 
-@app.route('/api/user/info', methods = ['GET'])
+@app.route('/api/user/info', methods = ['POST'])
 @json_data_validation( {'username': str} )
 @api_token_required
 def api_get_info_about_user():
@@ -128,3 +130,58 @@ def api_auth_user():
     if not user.auth(password):
         return jsonify(status = 'error', msg = 'Incorrect password.', code = 3), 401
     return jsonify(status = 'success', msg = 'Successfully authorized.', code = None, token = user.get_api_token()), 200
+
+
+
+
+
+#Comments:
+
+@app.route('/api/comment/add', methods = ['POST'])
+@json_data_validation( {'stars': int, 'body': str, 'mark_id': int} )
+@api_token_required
+def api_add_comment():
+    data = request.get_json()
+    stars = data.get('stars')
+    body = data.get('body')
+    mark_id = data.get('mark_id')
+#VALIDATION:
+    if (stars < 0 or stars > 5) or (len(body) > 2048):
+        return jsonify(status = 'error', msg = 'Incorrect request.', code = 1), 400
+    mark = Mark.query.get(mark_id)
+    if mark is None:
+        return jsonify(status = 'error', msg = ('Mark with ID '+str(mark_id)+' not found.'), code = 2), 404
+#END VALIADTION
+    comment = Comment(body = body, stars = stars, user = g.user, mark = mark)
+    db.session.add(comment)
+    db.session.commit()
+    return jsonify(status = 'success', msg = 'Comment successfully added.', code = None), 200
+
+
+
+
+@app.route('/api/comment/get', methods = ['POST'])
+@json_data_validation( {'mark_id': int, 'start': int, 'cnt': int} )
+def api_get_comment():
+    data = request.get_json()
+    start = data.get('start')
+    cnt = data.get('cnt')
+    mark_id = data.get('mark_id')
+#VALIADTION:
+    mark = Mark.query.get(mark_id)
+    if mark is None:
+        return jsonify(status = 'error', msg = ('Mark with ID '+str(mark_id)+' not found.'), code = 1), 404
+    n = len(mark.comments)
+    if start > n or start < 0:
+        return jsonify(status = 'error', msg = ('Cant start from '+str(start)+' bcs mark has only '+str(n)+' comments.'), code = 2), 400
+#END VALIADTION
+    finish = min(start+cnt, n)
+    comments = []
+    for i in range(start, finish):
+        c = mark.comments[i]
+        data = {}
+        data['body'] = c.body
+        data['name'] = c.user.name
+        data['stars'] = c.stars
+        comments.append(data)
+    return jsonify(status = 'success', msg = ('Comments from '+str(start)+' to '+str(finish)), code = None, cnt = n, comments = comments), 200

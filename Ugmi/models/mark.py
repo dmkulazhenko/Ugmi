@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import os, subprocess
+import os, subprocess, json
 from flask import send_from_directory
 from shutil import rmtree
 from datetime import datetime
@@ -19,6 +19,7 @@ class Mark(db.Model):
     creation_time = db.Column(db.DateTime, default = datetime.utcnow())
     views = db.Column(db.Integer, default = 0)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    comments = db.relationship('Comment', backref = 'mark')
     __table_args__ = (
         db.PrimaryKeyConstraint('id'),
     )
