@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail
 from flask_login import LoginManager
+from flask_wtf.csrf import CSRFProtect
 from itsdangerous import URLSafeTimedSerializer, TimedJSONWebSignatureSerializer
 from Ugmi.utils import init_Ugmi
 from momentjs import momentjs
@@ -20,6 +21,8 @@ lm   = LoginManager()
 
 lm.init_app(app)
 lm.login_view = 'login'
+
+csrf = CSRFProtect(app)
 
 email_confirm_serializer  = URLSafeTimedSerializer(app.config['SECRET_CONFIRM_EMAIL_KEY'])
 password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_PASSWORD_RESET_KEY'])

@@ -10,6 +10,7 @@
 
                 <form class="center-block g-width-500--sm g-width-550--md" enctype="multipart/form-data" method="post" action="">
                     {{form.hidden_tag()}}
+                    {{form.csrf_token}}
                     <div class="g-margin-b-30--xs">
                         {{form.mark_id(class_="form-control s-form-v3__input")}}
                     </div>

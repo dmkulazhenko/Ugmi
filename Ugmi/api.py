@@ -143,7 +143,7 @@ def api_user_recovery():
     else:
         user = User.query.filter_by(username = username_or_email).first()
     if user is None:
-        return jsonify(status = 'error', msg = ("User with username '" + username + "' not found."), code = 1), 200
+        return jsonify(status = 'error', msg = ("User with username/email '" + username_or_email + "' not found."), code = 1), 200
     if (user.last_password_reset != None) and ((datetime.utcnow() - user.last_password_reset).total_seconds() < 900):
         return jsonify(status = 'error', msg = 'Next reset with interval in 15 minutes.', code = 2), 200
     user.send_password_reset_token()

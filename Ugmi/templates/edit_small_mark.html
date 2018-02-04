@@ -9,6 +9,7 @@
                     <div class="g-text-center--xs g-margin-b-40--xs">
                         <form enctype="multipart/form-data" method="post" action="">
                             {{form.hidden_tag()}}
+                            {{form.csrf_token}}
                             <button type="submit" class="dcp" style="float: right">
                                 <i class="g-font-size-22--xs g-color--white ti-check"></i>
                             </button>
