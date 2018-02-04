@@ -3,7 +3,7 @@ from flask import request, jsonify, g
 from functools import wraps
 from datetime import datetime
 
-from Ugmi import app, db
+from Ugmi import app, db, csrf
 
 from .models.user import User
 from .models.comment import Comment
@@ -62,6 +62,7 @@ def not_found_error(error):
 
 #Main views:
 @app.route('/api/user/register', methods = ['POST'])
+@csrf.exempt
 @json_data_validation( {'username': str, 'name': str, 'email': str, 'password': str} )
 def api_register_user():
     data = request.get_json()
@@ -104,6 +105,7 @@ def api_register_user():
 
 
 @app.route('/api/user/info', methods = ['POST'])
+@csrf.exempt
 @json_data_validation( {'username': str} )
 @api_token_required
 def api_get_info_about_user():
@@ -119,6 +121,7 @@ def api_get_info_about_user():
 
 
 @app.route('/api/user/login', methods = ['POST'])
+@csrf.exempt
 @json_data_validation( {'username': str, 'password': str} )
 def api_auth_user():
     data = request.get_json()
@@ -135,6 +138,7 @@ def api_auth_user():
 
 
 @app.route('/api/user/recovery', methods = ['POST'])
+@csrf.exempt
 @json_data_validation( {'username_or_email': str} )
 def api_user_recovery():
     username_or_email = request.get_json().get('username_or_email')
@@ -154,6 +158,7 @@ def api_user_recovery():
 #Comments:
 
 @app.route('/api/comment/add', methods = ['POST'])
+@csrf.exempt
 @json_data_validation( {'stars': int, 'body': str, 'mark_id': int} )
 @api_token_required
 def api_add_comment():
@@ -176,6 +181,7 @@ def api_add_comment():
 
 
 @app.route('/api/comment/get', methods = ['POST'])
+@csrf.exempt
 @json_data_validation( {'mark_id': int, 'start': int, 'cnt': int} )
 def api_get_comment():
     data = request.get_json()
