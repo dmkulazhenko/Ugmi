@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-from Ugmi import db, app
+from Ugmi import db
 
 
-
-
-class Support_msg(db.Model):
+class SupportMsg(db.Model):
     __tablename__ = 'support_msg'
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64))
     email = db.Column(db.String(64))
     phone = db.Column(db.String(20))
@@ -18,4 +16,4 @@ class Support_msg(db.Model):
         db.session.commit()
 
     def __repr__(self):
-        return '<Support_msg from %r with email %r left %r>' % (self.name, self.email, self.date)
+        return '<SupportMsg from %r with email %r left %r>' % (self.name, self.email, self.date)

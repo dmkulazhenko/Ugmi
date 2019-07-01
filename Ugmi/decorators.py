@@ -6,7 +6,7 @@ from functools import wraps
 from .models.mark import Mark
 
 
-def async(f):
+def asynchronous(f):
     def wrapper(*args, **kwargs):
         thr = Thread(target = f, args = args, kwargs = kwargs)
         thr.start()

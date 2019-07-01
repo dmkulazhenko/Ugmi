@@ -8,33 +8,31 @@ from .models.mark import Mark
 from .decorators import admin_only
 
 
-#User:
+# User:
 @app.route('/ajax/user/list')
 @admin_only
 def ajax_get_list_of_users():
     users = User.query.all()
-    data = {}
-    data['status'] = 'success'
-    data['users'] = []
+    data = {'status': 'success', 'users': []}
     for user in users:
-        user_data = {}
-        user_data['id'] = user.id
-        user_data['username'] = user.username
-        user_data['email'] = user.email
-        user_data['name'] = user.name
-        user_data['role'] = user.role
-        user_data['have_marks'] = user.have_marks
-        user_data['max_marks'] = user.max_marks
+        user_data = {
+            'id': user.id,
+            'username': user.username,
+            'email': user.email,
+            'name': user.name,
+            'role': user.role,
+            'have_marks': user.have_marks,
+            'max_marks': user.max_marks
+        }
         data['users'].append(user_data)
     return jsonify(data)
-
 
 
 @app.route('/ajax/user/<username>')
 @admin_only
 def ajax_get_info_about_user(username):
     data = {}
-    user = User.query.filter_by(username = username).first()
+    user = User.query.filter_by(username=username).first()
     if not user:
         data['status'] = 'error'
         data['msg'] = "User with username '" + username + "' not found."
@@ -49,12 +47,12 @@ def ajax_get_info_about_user(username):
 def ajax_confirm_user():
     data = {}
     username = request.args.get('username')
-    user = User.query.filter_by(username = username).first()
+    user = User.query.filter_by(username=username).first()
     if not user:
         data['status'] = 'error'
         data['msg'] = "User with username '" + username + "' not found."
         return jsonify(data)
-    if user.confirmed == False:
+    if not user.confirmed:
         user.confirmed = True
         user.write_to_db()
         data['status'] = 'success'
@@ -69,7 +67,7 @@ def ajax_confirm_user():
 def ajax_delete_user():
     data = {}
     username = request.args.get('username')
-    user = User.query.filter_by(username = username).first()
+    user = User.query.filter_by(username=username).first()
     if not user:
         data['status'] = 'error'
         data['msg'] = "User with username '" + username + "' not found."
@@ -88,14 +86,14 @@ def ajax_delete_user():
     return jsonify(data)
 
 
-#Set:
+# Set:
 @app.route('/ajax/user/set/role')
 @admin_only
 def ajax_set_role_for_user():
     data = {}
     username = request.args.get('username')
-    role_id = request.args.get('role_id', default = 1, type = int)
-    user = User.query.filter_by(username = username).first()
+    role_id = request.args.get('role_id', default=1, type=int)
+    user = User.query.filter_by(username=username).first()
     if not user:
         data['status'] = 'error'
         data['msg'] = "User with username '" + username + "' not found."
@@ -109,7 +107,7 @@ def ajax_set_role_for_user():
     user.custom_marks_limit = None
     user.write_to_db()
     data['status'] = 'success'
-    data['msg'] = username +'`s role: ' + str(role_was) + ' -> ' + str(role_id) +'.'
+    data['msg'] = username + '`s role: ' + str(role_was) + ' -> ' + str(role_id) + '.'
     return jsonify(data)
 
 
@@ -118,8 +116,8 @@ def ajax_set_role_for_user():
 def ajax_set_custom_marks_limit_for_user():
     data = {}
     username = request.args.get('username')
-    max_marks = request.args.get('max_marks', default = None, type = int)
-    user = User.query.filter_by(username = username).first()
+    max_marks = request.args.get('max_marks', default=None, type=int)
+    user = User.query.filter_by(username=username).first()
     if not user:
         data['status'] = 'error'
         data['msg'] = "User with username '" + username + "' not found."
@@ -131,25 +129,18 @@ def ajax_set_custom_marks_limit_for_user():
     user.custom_marks_limit = max_marks
     user.write_to_db()
     data['status'] = 'success'
-    data['msg'] = username +'`s marks limit successfully updated.'
+    data['msg'] = username + '`s marks limit successfully updated.'
     return jsonify(data)
 
 
-
-#Mark:
+# Mark:
 @app.route('/ajax/mark/list')
 @admin_only
 def ajax_get_list_of_marks():
     marks = Mark.query.all()
-    data = {}
-    data['status'] = 'success'
-    data['marks'] = []
+    data = {'status': 'success', 'marks': []}
     for mark in marks:
-        mark_data = {}
-        mark_data['id'] = mark.id
-        mark_data['title'] = mark.title
-        mark_data['views'] = mark.views
-        mark_data['user'] = {}
+        mark_data = {'id': mark.id, 'title': mark.title, 'views': mark.views, 'user': {}}
         mark_data['user']['username'] = mark.user.username
         mark_data['user']['email'] = mark.user.email
         data['marks'].append(mark_data)
@@ -171,12 +162,12 @@ def ajax_get_info_about_mark(mark_id):
     return jsonify(data)
 
 
-#Delete
+# Delete
 @app.route('/ajax/mark/delete')
 @admin_only
 def ajax_delete_mark():
     data = {}
-    mark_id = request.args.get('mark_id', type = int)
+    mark_id = request.args.get('mark_id', type=int)
     mark = Mark.query.get(mark_id)
     if not mark:
         data['status'] = 'error'
