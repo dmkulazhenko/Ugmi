@@ -3,32 +3,47 @@ import os
 
 project_dir = os.path.dirname(__file__)
 base_dir = os.path.join(project_dir, 'Ugmi')
-database_dir = os.path.join(base_dir, 'database')
 marks_dir = os.path.join(base_dir, 'marks')
-temp_dir = os.path.join(base_dir, 'temp')
+temp_dir = os.environ.get("TEMP_DIR", os.path.join(base_dir, 'temp'))
 
 # Flask config
-DEBUG = True
-SECRET_KEY = ''
+DEBUG = bool(int(os.environ.get("DEBUG", 1)))
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # WTForms config
-WTF_CSRF_SECRET_KEY = ''
+WTF_CSRF_SECRET_KEY = os.environ.get("WTF_CSRF_SECRET_KEY")
 
 # Hash salts
-SECRET_CONFIRM_EMAIL_SALT = ''
-SECRET_PASSWORD_RESET_SALT = ''
-SECRET_API_TOKEN_SALT = ''
+SECRET_CONFIRM_EMAIL_SALT = os.environ.get("SECRET_CONFIRM_EMAIL_SALT")
+SECRET_PASSWORD_RESET_SALT = os.environ.get("SECRET_PASSWORD_RESET_SALT")
+SECRET_API_TOKEN_SALT = os.environ.get("SECRET_API_TOKEN_SALT")
 
 # Serializer secret keys
-SECRET_CONFIRM_EMAIL_KEY = ''
-SECRET_PASSWORD_RESET_KEY = ''
-SECRET_API_TOKEN_KEY = ''
+SECRET_CONFIRM_EMAIL_KEY = os.environ.get("SECRET_CONFIRM_EMAIL_KEY")
+SECRET_PASSWORD_RESET_KEY = os.environ.get("SECRET_PASSWORD_RESET_KEY")
+SECRET_API_TOKEN_KEY = os.environ.get("SECRET_API_TOKEN_KEY")
 
 # SQLAlchemy config
 if not DEBUG:
-    SQLALCHEMY_DATABASE_URI = 'mysql://apps:@localhost/apps'
+    MYSQL_CREDENTIALS = (
+        os.environ.get("MYSQL_CONNECTOR"),
+        os.environ.get("MYSQL_USER"),
+        os.environ.get("MYSQL_PASSWORD"),
+        os.environ.get("MYSQL_HOST"),
+        os.environ.get("MYSQL_DATABASE"),
+    )
+    if all(MYSQL_CREDENTIALS):
+        SQLALCHEMY_DATABASE_URI = "mysql+{}://{}:{}@{}/{}".format(
+            *MYSQL_CREDENTIALS
+        )
 else:
-    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(database_dir, 'main.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(
+        project_dir, 'main.db'
+    )
+
+SQLALCHEMY_MIGRATIONS_DIR = (
+    os.environ.get("SQLALCHEMY_MIGRATIONS_DIR") or "migrations"
+)
 
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 
@@ -45,14 +60,14 @@ MAIL_SERVER = 'smtp.yandex.ru'
 MAIL_PORT = 465
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
-MAIL_USERNAME = 'no-reply@ugmi.me'
-MAIL_PASSWORD = ''
+MAIL_USERNAME = os.environ.get("MAIL_USERNAME")
+MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 
 # Administrators list
-ADMINS = ['dimkaxdx@gmail.com', 'derovi@list.ru', 'vladislav.oleshko@gmail.com', 'headsli@yandex.ru']
+ADMINS = []
 
 # Support mail
-MAIL_SUPPORT = 'support@ugmi.me'
+MAIL_SUPPORT = 'support@ugmi.xionix.xyz'
 
 # Roles
 ROLE_DEFAULT = 0
@@ -82,10 +97,7 @@ LOG_FILE = 'ugmi.log'
 
 # Small marks
 SMALL_GENERATOR = os.path.join(marks_dir, 'small_generator.jar')
-SMALL_MARKS_DIR = os.path.join(marks_dir, 'small')
+SMALL_MARKS_DIR = os.environ.get("DATA_DIR", os.path.join(marks_dir, 'small'))
 SMALL_MARKS_EXTENSION = '.png'
-if not DEBUG:
-    SMALL_MARKS_JSON_DIR = '/var/www/html/data'
-else:
-    SMALL_MARKS_JSON_DIR = SMALL_MARKS_DIR
+SMALL_MARKS_JSON_DIR = SMALL_MARKS_DIR
 SMALL_MARKS_JSON_FILE = 'data.json'

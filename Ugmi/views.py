@@ -104,7 +104,7 @@ def beta():
     return render_template('beta.html')
 
 
-@app.route('/download', methods=['GET'])
+@app.route('/download', methods=['GET', 'POST'])
 def download():
     form = forms.RegistrationForm()
     if form.validate_on_submit():

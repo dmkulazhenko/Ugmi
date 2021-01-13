@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  web:
+    container_name: ugmi_web
+    build: .
+    working_dir: /app
+    environment:
+      - FLASK_APP=ugmi.py
+      - SQLALCHEMY_MIGRATIONS_DIR=/migrations
+      - MYSQL_CONNECTOR=mysqlconnector
+      - MYSQL_HOST=db:3306
+      - MYSQL_WAITER=30:5
+      - DATA_DIR=/ugmi_data
+      - TEMP_DIR=/ugmi_temp
+      - DEBUG=0
+    env_file:
+      - .env
+    volumes:
+      - .:/app:ro
+      - ./migrations:/migrations:rw
+      - ./data:/ugmi_data:rw
+    ports:
+      - 8000:5000
+    links:
+      - db
+    restart: unless-stopped
+    depends_on:
+      - db
+    command: /bin/sh ugmi.sh $MIGRATE
+
+  db:
+    container_name: ugmi_db
+    image: mysql:8.0.22
+    env_file:
+      - .env
+    expose:
+      - 3306
+    volumes:
+      - ./mysql_data:/var/lib/mysql:rw
+    restart: unless-stopped
