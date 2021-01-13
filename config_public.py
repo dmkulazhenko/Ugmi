@@ -67,7 +67,7 @@ MAIL_PASSWORD = os.environ.get("MAIL_PASSWORD")
 ADMINS = []
 
 # Support mail
-MAIL_SUPPORT = 'support@ugmi.xionix.xyz'
+MAIL_SUPPORT = 'ugmi@xionix.xyz'
 
 # Roles
 ROLE_DEFAULT = 0
